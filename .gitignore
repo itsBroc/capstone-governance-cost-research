@@ -1,4 +1,5 @@
 data-raw/
 data-clean/
+data-faults/
 __pycache__/
 *.py[cod]
