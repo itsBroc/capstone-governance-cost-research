@@ -88,11 +88,7 @@ def read_aemo_chunks(file_path: Path, data_columns: list[str]):
 
 #Output file path for each day
 def get_output_path(output_file: Path, table_name: str, market_day) -> Path:
-    return (output_file
-            /f"year={market_day.year:04d}"
-            /f"month={market_day.month:02d}"
-            /f"day={market_day.day:02d}"
-            /f"{table_name}_{market_day.isoformat()}.csv")
+    return output_file / f"{table_name}_{market_day.isoformat()}.csv"
 
 ### Processing Functions
 

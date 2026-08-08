@@ -1,5 +1,6 @@
 data-raw/
 data-clean/
 data-faults/
+Meeting Minutes/
 __pycache__/
 *.py[cod]
