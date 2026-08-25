@@ -1,0 +1,983 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-capstone-gov-dev"
+		},
+		"ls_adls_capstone_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adls_capstone'"
+		},
+		"ls_adls_capstone_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stcapstonegovdev01.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_adls_capstone')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_adls_capstone_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_adls_capstone_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_raw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Tablename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().Tablename, '.csv')",
+							"type": "Expression"
+						},
+						"folderPath": "data-raw",
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "SETTLEMENTDATE",
+						"type": "String"
+					},
+					{
+						"name": "RUNNO",
+						"type": "String"
+					},
+					{
+						"name": "REGIONID",
+						"type": "String"
+					},
+					{
+						"name": "DISPATCHINTERVAL",
+						"type": "String"
+					},
+					{
+						"name": "INTERVENTION",
+						"type": "String"
+					},
+					{
+						"name": "TOTALDEMAND",
+						"type": "String"
+					},
+					{
+						"name": "AVAILABLEGENERATION",
+						"type": "String"
+					},
+					{
+						"name": "AVAILABLELOAD",
+						"type": "String"
+					},
+					{
+						"name": "DEMANDFORECAST",
+						"type": "String"
+					},
+					{
+						"name": "DISPATCHABLEGENERATION",
+						"type": "String"
+					},
+					{
+						"name": "DISPATCHABLELOAD",
+						"type": "String"
+					},
+					{
+						"name": "NETINTERCHANGE",
+						"type": "String"
+					},
+					{
+						"name": "EXCESSGENERATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECPRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECLOCALPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECPRICE",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECSUPPLYPRICE",
+						"type": "String"
+					},
+					{
+						"name": "AGGEGATEDISPATCHERROR",
+						"type": "String"
+					},
+					{
+						"name": "AGGREGATEDISPATCHERROR",
+						"type": "String"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "String"
+					},
+					{
+						"name": "INITIALSUPPLY",
+						"type": "String"
+					},
+					{
+						"name": "CLEAREDSUPPLY",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGIMPORT",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGLOCALREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGREQ",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECLOCALVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECVIOLATION",
+						"type": "String"
+					},
+					{
+						"name": "RAISE6SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "RAISE60SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "RAISE5MINACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "RAISEREGACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LOWER6SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LOWER60SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LOWER5MINACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LOWERREGACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LORSURPLUS",
+						"type": "String"
+					},
+					{
+						"name": "LRCSURPLUS",
+						"type": "String"
+					},
+					{
+						"name": "TOTALINTERMITTENTGENERATION",
+						"type": "String"
+					},
+					{
+						"name": "DEMAND_AND_NONSCHEDGEN",
+						"type": "String"
+					},
+					{
+						"name": "UIGF",
+						"type": "String"
+					},
+					{
+						"name": "SEMISCHEDULE_CLEAREDMW",
+						"type": "String"
+					},
+					{
+						"name": "SEMISCHEDULE_COMPLIANCEMW",
+						"type": "String"
+					},
+					{
+						"name": "SS_SOLAR_UIGF",
+						"type": "String"
+					},
+					{
+						"name": "SS_WIND_UIGF",
+						"type": "String"
+					},
+					{
+						"name": "SS_SOLAR_CLEAREDMW",
+						"type": "String"
+					},
+					{
+						"name": "SS_WIND_CLEAREDMW",
+						"type": "String"
+					},
+					{
+						"name": "SS_SOLAR_COMPLIANCEMW",
+						"type": "String"
+					},
+					{
+						"name": "SS_WIND_COMPLIANCEMW",
+						"type": "String"
+					},
+					{
+						"name": "WDR_INITIALMW",
+						"type": "String"
+					},
+					{
+						"name": "WDR_AVAILABLE",
+						"type": "String"
+					},
+					{
+						"name": "WDR_DISPATCHED",
+						"type": "String"
+					},
+					{
+						"name": "SS_SOLAR_AVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "SS_WIND_AVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "RAISE1SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "LOWER1SECLOCALDISPATCH",
+						"type": "String"
+					},
+					{
+						"name": "RAISE1SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "LOWER1SECACTUALAVAILABILITY",
+						"type": "String"
+					},
+					{
+						"name": "BDU_ENERGY_STORAGE",
+						"type": "String"
+					},
+					{
+						"name": "BDU_MIN_AVAIL",
+						"type": "String"
+					},
+					{
+						"name": "BDU_MAX_AVAIL",
+						"type": "String"
+					},
+					{
+						"name": "BDU_CLEAREDMW_GEN",
+						"type": "String"
+					},
+					{
+						"name": "BDU_CLEAREDMW_LOAD",
+						"type": "String"
+					},
+					{
+						"name": "BDU_INITIAL_ENERGY_STORAGE",
+						"type": "String"
+					},
+					{
+						"name": "DECGEN_INITIAL_ENERGY_STORAGE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_processed_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"GovernanceTier": {
+						"type": "string"
+					},
+					"ScenarioID": {
+						"type": "string"
+					},
+					"RunID": {
+						"type": "string"
+					},
+					"TableName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().TableName, '.parquet')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat('data-processed/', dataset().GovernanceTier, '/', dataset().ScenarioID, '/', dataset().RunID)",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_ungoverned')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_raw",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_processed_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          RUNNO as string,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as string,",
+						"          INTERVENTION as string,",
+						"          TOTALDEMAND as string,",
+						"          AVAILABLEGENERATION as string,",
+						"          AVAILABLELOAD as string,",
+						"          DEMANDFORECAST as string,",
+						"          DISPATCHABLEGENERATION as string,",
+						"          DISPATCHABLELOAD as string,",
+						"          NETINTERCHANGE as string,",
+						"          EXCESSGENERATION as string,",
+						"          LOWER5MINDISPATCH as string,",
+						"          LOWER5MINIMPORT as string,",
+						"          LOWER5MINLOCALDISPATCH as string,",
+						"          LOWER5MINLOCALPRICE as string,",
+						"          LOWER5MINLOCALREQ as string,",
+						"          LOWER5MINPRICE as string,",
+						"          LOWER5MINREQ as string,",
+						"          LOWER5MINSUPPLYPRICE as string,",
+						"          LOWER60SECDISPATCH as string,",
+						"          LOWER60SECIMPORT as string,",
+						"          LOWER60SECLOCALDISPATCH as string,",
+						"          LOWER60SECLOCALPRICE as string,",
+						"          LOWER60SECLOCALREQ as string,",
+						"          LOWER60SECPRICE as string,",
+						"          LOWER60SECREQ as string,",
+						"          LOWER60SECSUPPLYPRICE as string,",
+						"          LOWER6SECDISPATCH as string,",
+						"          LOWER6SECIMPORT as string,",
+						"          LOWER6SECLOCALDISPATCH as string,",
+						"          LOWER6SECLOCALPRICE as string,",
+						"          LOWER6SECLOCALREQ as string,",
+						"          LOWER6SECPRICE as string,",
+						"          LOWER6SECREQ as string,",
+						"          LOWER6SECSUPPLYPRICE as string,",
+						"          RAISE5MINDISPATCH as string,",
+						"          RAISE5MINIMPORT as string,",
+						"          RAISE5MINLOCALDISPATCH as string,",
+						"          RAISE5MINLOCALPRICE as string,",
+						"          RAISE5MINLOCALREQ as string,",
+						"          RAISE5MINPRICE as string,",
+						"          RAISE5MINREQ as string,",
+						"          RAISE5MINSUPPLYPRICE as string,",
+						"          RAISE60SECDISPATCH as string,",
+						"          RAISE60SECIMPORT as string,",
+						"          RAISE60SECLOCALDISPATCH as string,",
+						"          RAISE60SECLOCALPRICE as string,",
+						"          RAISE60SECLOCALREQ as string,",
+						"          RAISE60SECPRICE as string,",
+						"          RAISE60SECREQ as string,",
+						"          RAISE60SECSUPPLYPRICE as string,",
+						"          RAISE6SECDISPATCH as string,",
+						"          RAISE6SECIMPORT as string,",
+						"          RAISE6SECLOCALDISPATCH as string,",
+						"          RAISE6SECLOCALPRICE as string,",
+						"          RAISE6SECLOCALREQ as string,",
+						"          RAISE6SECPRICE as string,",
+						"          RAISE6SECREQ as string,",
+						"          RAISE6SECSUPPLYPRICE as string,",
+						"          AGGEGATEDISPATCHERROR as string,",
+						"          AGGREGATEDISPATCHERROR as string,",
+						"          LASTCHANGED as string,",
+						"          INITIALSUPPLY as string,",
+						"          CLEAREDSUPPLY as string,",
+						"          LOWERREGIMPORT as string,",
+						"          LOWERREGLOCALDISPATCH as string,",
+						"          LOWERREGLOCALREQ as string,",
+						"          LOWERREGREQ as string,",
+						"          RAISEREGIMPORT as string,",
+						"          RAISEREGLOCALDISPATCH as string,",
+						"          RAISEREGLOCALREQ as string,",
+						"          RAISEREGREQ as string,",
+						"          RAISE5MINLOCALVIOLATION as string,",
+						"          RAISEREGLOCALVIOLATION as string,",
+						"          RAISE60SECLOCALVIOLATION as string,",
+						"          RAISE6SECLOCALVIOLATION as string,",
+						"          LOWER5MINLOCALVIOLATION as string,",
+						"          LOWERREGLOCALVIOLATION as string,",
+						"          LOWER60SECLOCALVIOLATION as string,",
+						"          LOWER6SECLOCALVIOLATION as string,",
+						"          RAISE5MINVIOLATION as string,",
+						"          RAISEREGVIOLATION as string,",
+						"          RAISE60SECVIOLATION as string,",
+						"          RAISE6SECVIOLATION as string,",
+						"          LOWER5MINVIOLATION as string,",
+						"          LOWERREGVIOLATION as string,",
+						"          LOWER60SECVIOLATION as string,",
+						"          LOWER6SECVIOLATION as string,",
+						"          RAISE6SECACTUALAVAILABILITY as string,",
+						"          RAISE60SECACTUALAVAILABILITY as string,",
+						"          RAISE5MINACTUALAVAILABILITY as string,",
+						"          RAISEREGACTUALAVAILABILITY as string,",
+						"          LOWER6SECACTUALAVAILABILITY as string,",
+						"          LOWER60SECACTUALAVAILABILITY as string,",
+						"          LOWER5MINACTUALAVAILABILITY as string,",
+						"          LOWERREGACTUALAVAILABILITY as string,",
+						"          LORSURPLUS as string,",
+						"          LRCSURPLUS as string,",
+						"          TOTALINTERMITTENTGENERATION as string,",
+						"          DEMAND_AND_NONSCHEDGEN as string,",
+						"          UIGF as string,",
+						"          SEMISCHEDULE_CLEAREDMW as string,",
+						"          SEMISCHEDULE_COMPLIANCEMW as string,",
+						"          SS_SOLAR_UIGF as string,",
+						"          SS_WIND_UIGF as string,",
+						"          SS_SOLAR_CLEAREDMW as string,",
+						"          SS_WIND_CLEAREDMW as string,",
+						"          SS_SOLAR_COMPLIANCEMW as string,",
+						"          SS_WIND_COMPLIANCEMW as string,",
+						"          WDR_INITIALMW as string,",
+						"          WDR_AVAILABLE as string,",
+						"          WDR_DISPATCHED as string,",
+						"          SS_SOLAR_AVAILABILITY as string,",
+						"          SS_WIND_AVAILABILITY as string,",
+						"          RAISE1SECLOCALDISPATCH as string,",
+						"          LOWER1SECLOCALDISPATCH as string,",
+						"          RAISE1SECACTUALAVAILABILITY as string,",
+						"          LOWER1SECACTUALAVAILABILITY as string,",
+						"          BDU_ENERGY_STORAGE as string,",
+						"          BDU_MIN_AVAIL as string,",
+						"          BDU_MAX_AVAIL as string,",
+						"          BDU_CLEAREDMW_GEN as string,",
+						"          BDU_CLEAREDMW_LOAD as string,",
+						"          BDU_INITIAL_ENERGY_STORAGE as string,",
+						"          DECGEN_INITIAL_ENERGY_STORAGE as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_raw')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_governed')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_raw",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_processed_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          RUNNO as string,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as string,",
+						"          INTERVENTION as string,",
+						"          TOTALDEMAND as string,",
+						"          AVAILABLEGENERATION as string,",
+						"          AVAILABLELOAD as string,",
+						"          DEMANDFORECAST as string,",
+						"          DISPATCHABLEGENERATION as string,",
+						"          DISPATCHABLELOAD as string,",
+						"          NETINTERCHANGE as string,",
+						"          EXCESSGENERATION as string,",
+						"          LOWER5MINDISPATCH as string,",
+						"          LOWER5MINIMPORT as string,",
+						"          LOWER5MINLOCALDISPATCH as string,",
+						"          LOWER5MINLOCALPRICE as string,",
+						"          LOWER5MINLOCALREQ as string,",
+						"          LOWER5MINPRICE as string,",
+						"          LOWER5MINREQ as string,",
+						"          LOWER5MINSUPPLYPRICE as string,",
+						"          LOWER60SECDISPATCH as string,",
+						"          LOWER60SECIMPORT as string,",
+						"          LOWER60SECLOCALDISPATCH as string,",
+						"          LOWER60SECLOCALPRICE as string,",
+						"          LOWER60SECLOCALREQ as string,",
+						"          LOWER60SECPRICE as string,",
+						"          LOWER60SECREQ as string,",
+						"          LOWER60SECSUPPLYPRICE as string,",
+						"          LOWER6SECDISPATCH as string,",
+						"          LOWER6SECIMPORT as string,",
+						"          LOWER6SECLOCALDISPATCH as string,",
+						"          LOWER6SECLOCALPRICE as string,",
+						"          LOWER6SECLOCALREQ as string,",
+						"          LOWER6SECPRICE as string,",
+						"          LOWER6SECREQ as string,",
+						"          LOWER6SECSUPPLYPRICE as string,",
+						"          RAISE5MINDISPATCH as string,",
+						"          RAISE5MINIMPORT as string,",
+						"          RAISE5MINLOCALDISPATCH as string,",
+						"          RAISE5MINLOCALPRICE as string,",
+						"          RAISE5MINLOCALREQ as string,",
+						"          RAISE5MINPRICE as string,",
+						"          RAISE5MINREQ as string,",
+						"          RAISE5MINSUPPLYPRICE as string,",
+						"          RAISE60SECDISPATCH as string,",
+						"          RAISE60SECIMPORT as string,",
+						"          RAISE60SECLOCALDISPATCH as string,",
+						"          RAISE60SECLOCALPRICE as string,",
+						"          RAISE60SECLOCALREQ as string,",
+						"          RAISE60SECPRICE as string,",
+						"          RAISE60SECREQ as string,",
+						"          RAISE60SECSUPPLYPRICE as string,",
+						"          RAISE6SECDISPATCH as string,",
+						"          RAISE6SECIMPORT as string,",
+						"          RAISE6SECLOCALDISPATCH as string,",
+						"          RAISE6SECLOCALPRICE as string,",
+						"          RAISE6SECLOCALREQ as string,",
+						"          RAISE6SECPRICE as string,",
+						"          RAISE6SECREQ as string,",
+						"          RAISE6SECSUPPLYPRICE as string,",
+						"          AGGEGATEDISPATCHERROR as string,",
+						"          AGGREGATEDISPATCHERROR as string,",
+						"          LASTCHANGED as string,",
+						"          INITIALSUPPLY as string,",
+						"          CLEAREDSUPPLY as string,",
+						"          LOWERREGIMPORT as string,",
+						"          LOWERREGLOCALDISPATCH as string,",
+						"          LOWERREGLOCALREQ as string,",
+						"          LOWERREGREQ as string,",
+						"          RAISEREGIMPORT as string,",
+						"          RAISEREGLOCALDISPATCH as string,",
+						"          RAISEREGLOCALREQ as string,",
+						"          RAISEREGREQ as string,",
+						"          RAISE5MINLOCALVIOLATION as string,",
+						"          RAISEREGLOCALVIOLATION as string,",
+						"          RAISE60SECLOCALVIOLATION as string,",
+						"          RAISE6SECLOCALVIOLATION as string,",
+						"          LOWER5MINLOCALVIOLATION as string,",
+						"          LOWERREGLOCALVIOLATION as string,",
+						"          LOWER60SECLOCALVIOLATION as string,",
+						"          LOWER6SECLOCALVIOLATION as string,",
+						"          RAISE5MINVIOLATION as string,",
+						"          RAISEREGVIOLATION as string,",
+						"          RAISE60SECVIOLATION as string,",
+						"          RAISE6SECVIOLATION as string,",
+						"          LOWER5MINVIOLATION as string,",
+						"          LOWERREGVIOLATION as string,",
+						"          LOWER60SECVIOLATION as string,",
+						"          LOWER6SECVIOLATION as string,",
+						"          RAISE6SECACTUALAVAILABILITY as string,",
+						"          RAISE60SECACTUALAVAILABILITY as string,",
+						"          RAISE5MINACTUALAVAILABILITY as string,",
+						"          RAISEREGACTUALAVAILABILITY as string,",
+						"          LOWER6SECACTUALAVAILABILITY as string,",
+						"          LOWER60SECACTUALAVAILABILITY as string,",
+						"          LOWER5MINACTUALAVAILABILITY as string,",
+						"          LOWERREGACTUALAVAILABILITY as string,",
+						"          LORSURPLUS as string,",
+						"          LRCSURPLUS as string,",
+						"          TOTALINTERMITTENTGENERATION as string,",
+						"          DEMAND_AND_NONSCHEDGEN as string,",
+						"          UIGF as string,",
+						"          SEMISCHEDULE_CLEAREDMW as string,",
+						"          SEMISCHEDULE_COMPLIANCEMW as string,",
+						"          SS_SOLAR_UIGF as string,",
+						"          SS_WIND_UIGF as string,",
+						"          SS_SOLAR_CLEAREDMW as string,",
+						"          SS_WIND_CLEAREDMW as string,",
+						"          SS_SOLAR_COMPLIANCEMW as string,",
+						"          SS_WIND_COMPLIANCEMW as string,",
+						"          WDR_INITIALMW as string,",
+						"          WDR_AVAILABLE as string,",
+						"          WDR_DISPATCHED as string,",
+						"          SS_SOLAR_AVAILABILITY as string,",
+						"          SS_WIND_AVAILABILITY as string,",
+						"          RAISE1SECLOCALDISPATCH as string,",
+						"          LOWER1SECLOCALDISPATCH as string,",
+						"          RAISE1SECACTUALAVAILABILITY as string,",
+						"          LOWER1SECACTUALAVAILABILITY as string,",
+						"          BDU_ENERGY_STORAGE as string,",
+						"          BDU_MIN_AVAIL as string,",
+						"          BDU_MAX_AVAIL as string,",
+						"          BDU_CLEAREDMW_GEN as string,",
+						"          BDU_CLEAREDMW_LOAD as string,",
+						"          BDU_INITIAL_ENERGY_STORAGE as string,",
+						"          DECGEN_INITIAL_ENERGY_STORAGE as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_raw')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_parquet')]"
+			]
+		}
+	]
+}
