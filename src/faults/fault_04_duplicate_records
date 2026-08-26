@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 INPUT_FILE = Path("src/data-clean/DU_DETAIL_SUMMARY/du_detail_summary.csv")
-OUTPUT_FOLDER = Path("src/data-faults")
+OUTPUT_FOLDER = Path("src/data-faults/s4")
 
 TARGET_COLUMN = "DUID"
 DUPLICATION_RATE = 0.10

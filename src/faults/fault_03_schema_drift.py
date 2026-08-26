@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 INPUT_FILE = Path("src/data-clean/DISPATCH_REGION_SUM/dispatch_region_sum_2025-06-04.csv")
-OUTPUT_FOLDER = Path("src/data-faults")
+OUTPUT_FOLDER = Path("src/data-faults/s3")
 
 ORIGINAL_COLUMN = "REGIONID"
 FAULTY_COLUMN = "REGION_ID"

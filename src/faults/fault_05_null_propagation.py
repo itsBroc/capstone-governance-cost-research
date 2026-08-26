@@ -1,8 +1,10 @@
 """
-Inject a type/format fault into one DISPATCH_UNIT_SCADA partition.
+Inject a join-key fault into one DISPATCH_UNIT_SCADA partition.
 
-- Reads one clean CSV partition
-- Replaces 3% of SCADAVALUE entries with non-numeric values
+- Reads one clean SCADA CSV partition
+- Selects 3% of unique DUID values
+- Replaces them with validly formatted but nonexistent DUIDs
+- Causes those records to fail matching DU_DETAIL_SUMMARY during the join
 - Writes the corrupted copy to a separate fault directory
 - Does not modify the clean source file
 """
@@ -10,11 +12,10 @@ Inject a type/format fault into one DISPATCH_UNIT_SCADA partition.
 from pathlib import Path
 import pandas as pd
 
-
 INPUT_FILE = Path("src/data-clean/DISPATCH_UNIT_SCADA/dispatch_unit_scada_2025-06-04.csv")
-OUTPUT_FOLDER = Path("src/data-faults/s1")
+OUTPUT_FOLDER = Path("src/data-faults/s5")
 
-TARGET_COLUMN = "SCADAVALUE"
+TARGET_COLUMN = "DUID"
 CORRUPTION_RATE = 0.03
 RANDOM_SEED = 42
 
@@ -29,24 +30,25 @@ def main() -> None:
             f"Column '{TARGET_COLUMN}' not found in {INPUT_FILE.name}"
         )
 
-    numeric_rows = pd.to_numeric(
-        data[TARGET_COLUMN],
-        errors="coerce",
-    ).notna()
+    unique_duids = data[TARGET_COLUMN].dropna().drop_duplicates()
 
-    rows_to_corrupt = data[numeric_rows].sample(
+    duids_to_corrupt = unique_duids.sample(
         frac=CORRUPTION_RATE,
         random_state=RANDOM_SEED,
-    ).index
+    )
 
-    data[TARGET_COLUMN] = data[TARGET_COLUMN].astype("object")
-    data.loc[rows_to_corrupt, TARGET_COLUMN] = "INVALID"
+    replacement_map = {
+        duid: f"UNMAPPED_{i:04d}"
+        for i, duid in enumerate(duids_to_corrupt, start=1)
+    }
+
+    data[TARGET_COLUMN] = data[TARGET_COLUMN].replace(replacement_map)
 
     OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
     output_file = OUTPUT_FOLDER / INPUT_FILE.name
     data.to_csv(output_file, index=False)
 
-    print(f"Rows corrupted: {len(rows_to_corrupt):,}")
+    print(f"DUIDs corrupted: {len(duids_to_corrupt):,}")
     print(f"Corruption rate: {CORRUPTION_RATE:.0%}")
 
 
