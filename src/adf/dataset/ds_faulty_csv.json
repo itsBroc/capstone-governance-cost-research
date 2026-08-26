@@ -1,15 +1,18 @@
 {
-	"name": "ds_raw",
+	"name": "ds_faulty_csv",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adls_capstone",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"TableName": {
+			"GovernanceTier": {
 				"type": "string"
 			},
 			"ScenarioID": {
+				"type": "string"
+			},
+			"TableName": {
 				"type": "string"
 			}
 		},
@@ -18,11 +21,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@{dataset().TableName}.csv",
-					"type": "Expression"
-				},
-				"folderPath": "data-raw/@{if(equals(dataset().ScenarioID, 's0'), 'clean', concat('fault-injection/', dataset().ScenarioID))}",
+				"fileName": "@{dataset().TableName}.csv",
+				"folderPath": "data-faulty/@{dataset().GovernanceTier}/@{dataset().ScenarioID}",
 				"fileSystem": "capstone"
 			},
 			"columnDelimiter": ",",

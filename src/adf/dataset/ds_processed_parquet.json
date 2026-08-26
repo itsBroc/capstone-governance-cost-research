@@ -12,9 +12,6 @@
 			"ScenarioID": {
 				"type": "string"
 			},
-			"RunID": {
-				"type": "string"
-			},
 			"TableName": {
 				"type": "string"
 			}
@@ -25,11 +22,11 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@concat(dataset().TableName, '.parquet')",
+					"value": "@{dataset().TableName}.parquet",
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat('data-processed/', dataset().GovernanceTier, '/', dataset().ScenarioID, '/', dataset().RunID)",
+					"value": "data-processed/@{dataset().GovernanceTier}/@{dataset().ScenarioID}",
 					"type": "Expression"
 				},
 				"fileSystem": "capstone"
