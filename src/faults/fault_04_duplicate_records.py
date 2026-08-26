@@ -11,7 +11,7 @@ Inject a duplicate records fault into DU_DETAIL_SUMMARY.
 from pathlib import Path
 import pandas as pd
 
-INPUT_FILE = Path("src/data-clean/DU_DETAIL_SUMMARY/du_detail_summary.csv")
+INPUT_FILE = Path("src/data-clean/DU_DETAIL_SUMMARY/du_detail_summary_2025-06-01_to_2025-06-07.csv")
 OUTPUT_FOLDER = Path("src/data-faults/s4")
 
 TARGET_COLUMN = "DUID"

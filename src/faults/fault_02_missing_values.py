@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 INPUT_FILE = Path("src/data-clean/TRADING_PRICE/trading_price_2025-06-04.csv")
-OUTPUT_FOLDER = Path("src/data-faults/s5")
+OUTPUT_FOLDER = Path("src/data-faults/s2")
 
 TIME_COLUMN = "SETTLEMENTDATE"
 TARGET_COLUMN = "RRP"
