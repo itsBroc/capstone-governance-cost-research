@@ -23,13 +23,13 @@ When a corrupted file is used, it is replaced in the pipeline, as opposed to bei
 ## Specific Fault Injection Scenarios and Associated Tables
 Cost measured for the 2 tiers of governance, 3 runs of the pipeliene. By the end, should have atleast 36 rows of usable data to draw conclusions on
 
-1. Base Pipeline Run: No Fault, Clean Output
-2. DISPATCH_UNIT_SCADA: Type/Format fault, Replace 1 of the 7 partitions with a file that has been pre-corrupted (Set 2-5% of the SCADA values to Non-Numeric)
-3. TRADINGPRICE: Missing/Null Fault, Replace 1 of the 7 partitions with a file that has been pre-corrupted (Set a block of time to Null values)
-4. DISPATCHREGIONSUM: Schema Change, Replace one DISPATCHREGIONSUM partition with a file where REGIONID is renamed to REGION_ID (OR Add an unexpected column)
+0. Base Pipeline Run: No Fault, Clean Output
+1. DISPATCH_UNIT_SCADA: Type/Format fault, Replace 1 of the 7 partitions with a file that has been pre-corrupted (Set 2-5% of the SCADA values to Non-Numeric)
+2. TRADINGPRICE: Missing/Null Fault, Replace 1 of the 7 partitions with a file that has been pre-corrupted (Set a block of time to Null values)
+3. DISPATCHREGIONSUM: Schema Change, Replace one DISPATCHREGIONSUM partition with a file where REGIONID is renamed to REGION_ID (OR Add an unexpected column)
     (Upstream Team modifying a database export without notifying downstream teams)
-5. DU_DETAIL_SUMMARY: Duplicate Records, duplicates a DUID subset before the join
-6. File Join: Null Propagation, Change a subset of SCADA DUID values to validly formatted but nonexistent identifiers so that they fail to match DU_DETAIL_SUMMARY
+4. DU_DETAIL_SUMMARY: Duplicate Records, duplicates a DUID subset before the join
+5. File Join: Null Propagation, Change a subset of SCADA DUID values to validly formatted but nonexistent identifiers so that they fail to match DU_DETAIL_SUMMARY
 
 Then could export the joined file to Azure Synapse analytics for something? (Could get some extra data to use?)
 

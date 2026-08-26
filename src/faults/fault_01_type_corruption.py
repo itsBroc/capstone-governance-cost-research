@@ -8,23 +8,15 @@ Inject a type/format fault into one DISPATCH_UNIT_SCADA partition.
 """
 
 from pathlib import Path
-
 import pandas as pd
 
 
-# Change this filename to the partition you want to corrupt.
-INPUT_FILE = Path(
-    "src/data-clean/DISPATCH_UNIT_SCADA/year=2025/month=06/day=04/dispatch_unit_scada_2025-06-04.csv"
-)
-
-OUTPUT_FOLDER = Path(
-    "src/data-faults"
-)
+INPUT_FILE = Path("src/data-clean/DISPATCH_UNIT_SCADA/dispatch_unit_scada_2025-06-04.csv")
+OUTPUT_FOLDER = Path("src/data-faults")
 
 TARGET_COLUMN = "SCADAVALUE"
 CORRUPTION_RATE = 0.03
 RANDOM_SEED = 42
-
 
 def main() -> None:
     if not INPUT_FILE.exists():
@@ -51,15 +43,9 @@ def main() -> None:
     data.loc[rows_to_corrupt, TARGET_COLUMN] = "INVALID"
 
     OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
-
-    output_file = OUTPUT_FOLDER / (
-        f"{INPUT_FILE.stem}_TYPE_FAULT.csv"
-    )
-
+    output_file = OUTPUT_FOLDER / INPUT_FILE.name
     data.to_csv(output_file, index=False)
 
-    print(f"Source file: {INPUT_FILE}")
-    print(f"Corrupted file: {output_file}")
     print(f"Rows corrupted: {len(rows_to_corrupt):,}")
     print(f"Corruption rate: {CORRUPTION_RATE:.0%}")
 

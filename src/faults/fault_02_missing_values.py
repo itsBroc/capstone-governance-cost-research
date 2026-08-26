@@ -8,23 +8,14 @@ Inject a missing/null fault into one TRADINGPRICE partition.
 """
 
 from pathlib import Path
-
 import pandas as pd
 
-
-# Change this filename to the partition you want to corrupt.
-INPUT_FILE = Path(
-    "src/data-clean/TRADING_PRICE/year=2025/month=06/day=04/trading_price_2025-06-04.csv"
-)
-
-OUTPUT_FOLDER = Path(
-    "src/data-faults"
-)
+INPUT_FILE = Path("src/data-clean/TRADING_PRICE/trading_price_2025-06-04.csv")
+OUTPUT_FOLDER = Path("src/data-faults")
 
 TIME_COLUMN = "SETTLEMENTDATE"
 TARGET_COLUMN = "RRP"
 
-# Change these values to define the missing time block.
 FAULT_START = pd.Timestamp("2025-06-04 12:00:00")
 FAULT_END = pd.Timestamp("2025-06-04 14:00:00")
 
@@ -61,15 +52,9 @@ def main() -> None:
     data.loc[rows_to_corrupt, TARGET_COLUMN] = pd.NA
 
     OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
-
-    output_file = OUTPUT_FOLDER / (
-        f"{INPUT_FILE.stem}_NULL_FAULT.csv"
-    )
-
+    output_file = OUTPUT_FOLDER / INPUT_FILE.name
     data.to_csv(output_file, index=False)
 
-    print(f"Source file: {INPUT_FILE}")
-    print(f"Corrupted file: {output_file}")
     print(f"Fault period: {FAULT_START} to {FAULT_END}")
     print(f"Rows set to null: {rows_to_corrupt.sum():,}")
 

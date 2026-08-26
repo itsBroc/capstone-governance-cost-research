@@ -1,0 +1,60 @@
+"""
+Inject a duplicate records fault into DU_DETAIL_SUMMARY.
+
+- Reads the clean DU_DETAIL_SUMMARY CSV
+- Selects 3% of unique DUID values
+- Duplicates all rows belonging to those DUIDs
+- Writes the corrupted copy to a separate fault directory
+- Does not modify the clean source file
+"""
+
+from pathlib import Path
+import pandas as pd
+
+INPUT_FILE = Path("src/data-clean/DU_DETAIL_SUMMARY/du_detail_summary.csv")
+OUTPUT_FOLDER = Path("src/data-faults")
+
+TARGET_COLUMN = "DUID"
+DUPLICATION_RATE = 0.10
+RANDOM_SEED = 42
+
+def main() -> None:
+    if not INPUT_FILE.exists():
+        raise FileNotFoundError(f"Input file not found: {INPUT_FILE}")
+
+    data = pd.read_csv(INPUT_FILE, low_memory=False)
+
+    if TARGET_COLUMN not in data.columns:
+        raise KeyError(
+            f"Column '{TARGET_COLUMN}' not found in {INPUT_FILE.name}"
+        )
+
+    unique_duids = data[TARGET_COLUMN].dropna().drop_duplicates()
+
+    duids_to_duplicate = unique_duids.sample(
+        frac=DUPLICATION_RATE,
+        random_state=RANDOM_SEED,
+    )
+
+    duplicate_rows = data[
+        data[TARGET_COLUMN].isin(duids_to_duplicate)
+    ].copy()
+
+    faulty_data = (
+        pd.concat([data, duplicate_rows], ignore_index=True)
+        .sample(frac=1, random_state=RANDOM_SEED)
+        .reset_index(drop=True)
+    )
+
+    OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
+    output_file = OUTPUT_FOLDER / INPUT_FILE.name
+    faulty_data.to_csv(output_file, index=False)
+
+    print(f"DUIDs duplicated: {len(duids_to_duplicate):,}")
+    print(f"Rows duplicated: {len(duplicate_rows):,}")
+    print(f"Original rows: {len(data):,}")
+    print(f"Faulty rows: {len(faulty_data):,}")
+
+
+if __name__ == "__main__":
+    main()
