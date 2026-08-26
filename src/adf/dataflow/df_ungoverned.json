@@ -10,15 +10,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "source1"
-				},
-				{
-					"name": "source2"
-				},
-				{
-					"name": "source3"
-				},
-				{
-					"name": "source4"
 				}
 			],
 			"sinks": [
@@ -28,41 +19,11 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
-				},
-				{
-					"name": "sink2"
-				},
-				{
-					"name": "sink3"
-				},
-				{
-					"name": "sink4"
 				}
 			],
 			"transformations": [
 				{
 					"name": "select1"
-				},
-				{
-					"name": "derivedColumn1"
-				},
-				{
-					"name": "select2"
-				},
-				{
-					"name": "derivedColumn2"
-				},
-				{
-					"name": "select3"
-				},
-				{
-					"name": "derivedColumn3"
-				},
-				{
-					"name": "select4"
-				},
-				{
-					"name": "derivedColumn4"
 				}
 			],
 			"scriptLines": [
@@ -203,48 +164,20 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source2",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source3",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source4",
 				"source1 select(mapColumn(",
-				"          each(match(/* All input columns */ true()),",
-				"               /* Input name */ $$ = $$)",
+				"          each(match(/* All input columns */true()),",
+				"               /* Input name */$$ = $$)",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1 derive() ~> derivedColumn1",
-				"source2 select(skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select2",
-				"select2 derive() ~> derivedColumn2",
-				"source3 select(skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select3",
-				"select3 derive() ~> derivedColumn3",
-				"source4 select(skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select4",
-				"select4 derive() ~> derivedColumn4",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink2",
-				"derivedColumn3 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink3",
-				"derivedColumn4 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink4"
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
