@@ -23,6 +23,23 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "String"
+			},
+			{
+				"name": "DUID",
+				"type": "String"
+			},
+			{
+				"name": "SCADAVALUE",
+				"type": "String"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "String"
+			}
+		]
 	}
 }

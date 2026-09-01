@@ -23,6 +23,515 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "String"
+			},
+			{
+				"name": "RUNNO",
+				"type": "String"
+			},
+			{
+				"name": "REGIONID",
+				"type": "String"
+			},
+			{
+				"name": "DISPATCHINTERVAL",
+				"type": "String"
+			},
+			{
+				"name": "INTERVENTION",
+				"type": "String"
+			},
+			{
+				"name": "TOTALDEMAND",
+				"type": "String"
+			},
+			{
+				"name": "AVAILABLEGENERATION",
+				"type": "String"
+			},
+			{
+				"name": "AVAILABLELOAD",
+				"type": "String"
+			},
+			{
+				"name": "DEMANDFORECAST",
+				"type": "String"
+			},
+			{
+				"name": "DISPATCHABLEGENERATION",
+				"type": "String"
+			},
+			{
+				"name": "DISPATCHABLELOAD",
+				"type": "String"
+			},
+			{
+				"name": "NETINTERCHANGE",
+				"type": "String"
+			},
+			{
+				"name": "EXCESSGENERATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECPRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECLOCALPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECPRICE",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECSUPPLYPRICE",
+				"type": "String"
+			},
+			{
+				"name": "AGGEGATEDISPATCHERROR",
+				"type": "String"
+			},
+			{
+				"name": "AGGREGATEDISPATCHERROR",
+				"type": "String"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "String"
+			},
+			{
+				"name": "INITIALSUPPLY",
+				"type": "String"
+			},
+			{
+				"name": "CLEAREDSUPPLY",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGIMPORT",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGLOCALREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGREQ",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECLOCALVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECVIOLATION",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LORSURPLUS",
+				"type": "String"
+			},
+			{
+				"name": "LRCSURPLUS",
+				"type": "String"
+			},
+			{
+				"name": "TOTALINTERMITTENTGENERATION",
+				"type": "String"
+			},
+			{
+				"name": "DEMAND_AND_NONSCHEDGEN",
+				"type": "String"
+			},
+			{
+				"name": "UIGF",
+				"type": "String"
+			},
+			{
+				"name": "SEMISCHEDULE_CLEAREDMW",
+				"type": "String"
+			},
+			{
+				"name": "SEMISCHEDULE_COMPLIANCEMW",
+				"type": "String"
+			},
+			{
+				"name": "SS_SOLAR_UIGF",
+				"type": "String"
+			},
+			{
+				"name": "SS_WIND_UIGF",
+				"type": "String"
+			},
+			{
+				"name": "SS_SOLAR_CLEAREDMW",
+				"type": "String"
+			},
+			{
+				"name": "SS_WIND_CLEAREDMW",
+				"type": "String"
+			},
+			{
+				"name": "SS_SOLAR_COMPLIANCEMW",
+				"type": "String"
+			},
+			{
+				"name": "SS_WIND_COMPLIANCEMW",
+				"type": "String"
+			},
+			{
+				"name": "WDR_INITIALMW",
+				"type": "String"
+			},
+			{
+				"name": "WDR_AVAILABLE",
+				"type": "String"
+			},
+			{
+				"name": "WDR_DISPATCHED",
+				"type": "String"
+			},
+			{
+				"name": "SS_SOLAR_AVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "SS_WIND_AVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "RAISE1SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "LOWER1SECLOCALDISPATCH",
+				"type": "String"
+			},
+			{
+				"name": "RAISE1SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "LOWER1SECACTUALAVAILABILITY",
+				"type": "String"
+			},
+			{
+				"name": "BDU_ENERGY_STORAGE",
+				"type": "String"
+			},
+			{
+				"name": "BDU_MIN_AVAIL",
+				"type": "String"
+			},
+			{
+				"name": "BDU_MAX_AVAIL",
+				"type": "String"
+			},
+			{
+				"name": "BDU_CLEAREDMW_GEN",
+				"type": "String"
+			},
+			{
+				"name": "BDU_CLEAREDMW_LOAD",
+				"type": "String"
+			},
+			{
+				"name": "BDU_INITIAL_ENERGY_STORAGE",
+				"type": "String"
+			},
+			{
+				"name": "DECGEN_INITIAL_ENERGY_STORAGE",
+				"type": "String"
+			}
+		]
 	}
 }

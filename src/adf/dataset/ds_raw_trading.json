@@ -23,6 +23,127 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "String"
+			},
+			{
+				"name": "RUNNO",
+				"type": "String"
+			},
+			{
+				"name": "REGIONID",
+				"type": "String"
+			},
+			{
+				"name": "PERIODID",
+				"type": "String"
+			},
+			{
+				"name": "RRP",
+				"type": "String"
+			},
+			{
+				"name": "EEP",
+				"type": "String"
+			},
+			{
+				"name": "INVALIDFLAG",
+				"type": "String"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "String"
+			},
+			{
+				"name": "ROP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE6SECROP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE60SECROP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINRRP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE5MINROP",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGRRP",
+				"type": "String"
+			},
+			{
+				"name": "RAISEREGROP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER6SECROP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER60SECROP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINRRP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER5MINROP",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGRRP",
+				"type": "String"
+			},
+			{
+				"name": "LOWERREGROP",
+				"type": "String"
+			},
+			{
+				"name": "PRICE_STATUS",
+				"type": "String"
+			},
+			{
+				"name": "RAISE1SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "RAISE1SECROP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER1SECRRP",
+				"type": "String"
+			},
+			{
+				"name": "LOWER1SECROP",
+				"type": "String"
+			}
+		]
 	}
 }

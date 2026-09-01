@@ -23,6 +23,123 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "DUID",
+				"type": "String"
+			},
+			{
+				"name": "START_DATE",
+				"type": "String"
+			},
+			{
+				"name": "END_DATE",
+				"type": "String"
+			},
+			{
+				"name": "DISPATCHTYPE",
+				"type": "String"
+			},
+			{
+				"name": "CONNECTIONPOINTID",
+				"type": "String"
+			},
+			{
+				"name": "REGIONID",
+				"type": "String"
+			},
+			{
+				"name": "STATIONID",
+				"type": "String"
+			},
+			{
+				"name": "PARTICIPANTID",
+				"type": "String"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "String"
+			},
+			{
+				"name": "TRANSMISSIONLOSSFACTOR",
+				"type": "String"
+			},
+			{
+				"name": "STARTTYPE",
+				"type": "String"
+			},
+			{
+				"name": "DISTRIBUTIONLOSSFACTOR",
+				"type": "String"
+			},
+			{
+				"name": "MINIMUM_ENERGY_PRICE",
+				"type": "String"
+			},
+			{
+				"name": "MAXIMUM_ENERGY_PRICE",
+				"type": "String"
+			},
+			{
+				"name": "SCHEDULE_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "MIN_RAMP_RATE_UP",
+				"type": "String"
+			},
+			{
+				"name": "MIN_RAMP_RATE_DOWN",
+				"type": "String"
+			},
+			{
+				"name": "MAX_RAMP_RATE_UP",
+				"type": "String"
+			},
+			{
+				"name": "MAX_RAMP_RATE_DOWN",
+				"type": "String"
+			},
+			{
+				"name": "IS_AGGREGATED",
+				"type": "String"
+			},
+			{
+				"name": "DISPATCHSUBTYPE",
+				"type": "String"
+			},
+			{
+				"name": "ADG_ID",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MINIMUM_ENERGY_PRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MAXIMUM_ENERGY_PRICE",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MIN_RAMP_RATE_UP",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MIN_RAMP_RATE_DOWN",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MAX_RAMP_RATE_UP",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_MAX_RAMP_RATE_DOWN",
+				"type": "String"
+			},
+			{
+				"name": "SECONDARY_TLF",
+				"type": "String"
+			}
+		]
 	}
 }
