@@ -18,11 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@{dataset().TableName}.csv",
+				"folderPath": {
+					"value": "data-raw/@{dataset().ScenarioID}/@{dataset().TableName}",
 					"type": "Expression"
 				},
-				"folderPath": "data-raw/@{if(equals(dataset().ScenarioID, 's0'), 'clean', concat('fault-injection/', dataset().ScenarioID))}",
 				"fileSystem": "capstone"
 			},
 			"columnDelimiter": ",",
