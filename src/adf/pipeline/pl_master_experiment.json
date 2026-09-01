@@ -1,0 +1,92 @@
+{
+	"name": "pl_master_experiment",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_ExperimentRun",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.RunMatrix",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "If_Governed",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().mode, 'governed')",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Run_Ungoverned",
+										"type": "ExecuteDataFlow",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataflow": {
+												"referenceName": "df_ungoverned",
+												"type": "DataFlowReference"
+											},
+											"compute": {
+												"coreCount": 8,
+												"computeType": "General"
+											},
+											"traceLevel": "Fine"
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Run_Governed",
+										"type": "ExecuteDataFlow",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataflow": {
+												"referenceName": "df_goverened",
+												"type": "DataFlowReference"
+											},
+											"compute": {
+												"coreCount": 8,
+												"computeType": "General"
+											},
+											"traceLevel": "Fine"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"RunMatrix": {
+				"type": "array"
+			}
+		},
+		"annotations": []
+	}
+}

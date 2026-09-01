@@ -10,6 +10,15 @@
 						"type": "DatasetReference"
 					},
 					"name": "source1"
+				},
+				{
+					"name": "source2"
+				},
+				{
+					"name": "source3"
+				},
+				{
+					"name": "source4"
 				}
 			],
 			"sinks": [
@@ -30,7 +39,7 @@
 				"parameters{",
 				"     GovernanceTier as string,",
 				"     ScenarioID as string,",
-				"     TableName as string",
+				"     Repetition as string",
 				"}",
 				"source(output(",
 				"          SETTLEMENTDATE as string,",
@@ -164,6 +173,12 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source1",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source2",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source3",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source4",
 				"source1 select(mapColumn(",
 				"          each(match(/* All input columns */true()),",
 				"               /* Input name */$$ = $$)",
