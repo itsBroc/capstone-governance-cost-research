@@ -103,7 +103,7 @@
 			],
 			"scriptLines": [
 				"parameters{",
-				"     GovernanceTier as string,",
+				"     GovernanceMode as string,",
 				"     ScenarioID as string,",
 				"     Repetition as string",
 				"}",
