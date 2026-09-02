@@ -26,7 +26,11 @@
 					"name": "sourceDU"
 				},
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "ds_raw_scada",
+						"type": "DatasetReference"
+					},
+					"name": "soruceSCADA"
 				}
 			],
 			"sinks": [
@@ -35,10 +39,16 @@
 						"referenceName": "ds_processed_parquet",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "sinkSCADA"
 				},
 				{
-					"name": "sink2"
+					"name": "sinkTRADING"
+				},
+				{
+					"name": "sinkREGION"
+				},
+				{
+					"name": "sinkDU"
 				}
 			],
 			"transformations": [
@@ -52,10 +62,31 @@
 					"name": "selectDU"
 				},
 				{
-					"name": "cast1"
+					"name": "castTrading"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "derivedTrading"
+				},
+				{
+					"name": "selectSCADA"
+				},
+				{
+					"name": "castSCADA"
+				},
+				{
+					"name": "derivedSCADA"
+				},
+				{
+					"name": "castREGION"
+				},
+				{
+					"name": "derivedREGION"
+				},
+				{
+					"name": "castDU"
+				},
+				{
+					"name": "derivedDU"
 				}
 			],
 			"scriptLines": [
@@ -265,8 +296,15 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> sourceDU",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
+				"source(output(",
+				"          SETTLEMENTDATE as string,",
+				"          DUID as string,",
+				"          SCADAVALUE as string,",
+				"          LASTCHANGED as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> soruceSCADA",
 				"sourceREGION select(mapColumn(",
 				"          each(match(/* All input columns */ true()),",
 				"               /* Input name */ $$ = $$)",
@@ -343,20 +381,51 @@
 				"selectTrading cast(output(",
 				"          SETTLEMENTDATE as string",
 				"     ),",
-				"     errors: true) ~> cast1",
-				"cast1 derive() ~> derivedColumn1",
-				"source1 sink(allowSchemaDrift: true,",
+				"     errors: true) ~> castTrading",
+				"castTrading derive() ~> derivedTrading",
+				"soruceSCADA select(mapColumn(",
+				"          SETTLEMENTDATE,",
+				"          DUID,",
+				"          SCADAVALUE,",
+				"          LASTCHANGED",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectSCADA",
+				"selectSCADA cast(output(",
+				"          SETTLEMENTDATE as string",
+				"     ),",
+				"     errors: true) ~> castSCADA",
+				"castSCADA derive() ~> derivedSCADA",
+				"selectREGION cast(output(",
+				"          SETTLEMENTDATE as string",
+				"     ),",
+				"     errors: true) ~> castREGION",
+				"castREGION derive() ~> derivedREGION",
+				"selectDU cast(output(",
+				"          DUID as string",
+				"     ),",
+				"     errors: true) ~> castDU",
+				"castDU derive() ~> derivedDU",
+				"derivedSCADA sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkSCADA",
+				"derivedTrading sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink2"
+				"     skipDuplicateMapOutputs: true) ~> sinkTRADING",
+				"derivedREGION sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkREGION",
+				"derivedDU sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkDU"
 			]
 		}
 	}

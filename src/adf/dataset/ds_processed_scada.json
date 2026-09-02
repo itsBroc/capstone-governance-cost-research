@@ -1,0 +1,31 @@
+{
+	"name": "ds_processed_scada",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_capstone",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"GovernanceMode": {
+				"type": "string"
+			},
+			"ScenarioID": {
+				"type": "string"
+			},
+			"Repetition": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA",
+				"fileSystem": "capstone"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
