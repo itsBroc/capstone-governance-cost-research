@@ -6,13 +6,6 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "ds_raw_scada",
-						"type": "DatasetReference"
-					},
-					"name": "sourceSCADA"
-				},
-				{
-					"dataset": {
 						"referenceName": "ds_raw_region",
 						"type": "DatasetReference"
 					},
@@ -31,6 +24,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourceDU"
+				},
+				{
+					"name": "source1"
 				}
 			],
 			"sinks": [
@@ -40,11 +36,26 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
+				},
+				{
+					"name": "sink2"
 				}
 			],
 			"transformations": [
 				{
-					"name": "select1"
+					"name": "selectREGION"
+				},
+				{
+					"name": "selectTrading"
+				},
+				{
+					"name": "selectDU"
+				},
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -53,15 +64,6 @@
 				"     ScenarioID as string,",
 				"     Repetition as string",
 				"}",
-				"source(output(",
-				"          SETTLEMENTDATE as string,",
-				"          DUID as string,",
-				"          SCADAVALUE as string,",
-				"          LASTCHANGED as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> sourceSCADA",
 				"source(output(",
 				"          SETTLEMENTDATE as string,",
 				"          RUNNO as string,",
@@ -263,20 +265,98 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> sourceDU",
-				"sourceSCADA select(mapColumn(",
-				"          each(match(/* All input columns */true()),",
-				"               /* Input name */$$ = $$)",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source1",
+				"sourceREGION select(mapColumn(",
+				"          each(match(/* All input columns */ true()),",
+				"               /* Input name */ $$ = $$)",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1 sink(allowSchemaDrift: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectREGION",
+				"sourceTRADING select(mapColumn(",
+				"          SETTLEMENTDATE,",
+				"          RUNNO,",
+				"          REGIONID,",
+				"          PERIODID,",
+				"          RRP,",
+				"          EEP,",
+				"          INVALIDFLAG,",
+				"          LASTCHANGED,",
+				"          ROP,",
+				"          RAISE6SECRRP,",
+				"          RAISE6SECROP,",
+				"          RAISE60SECRRP,",
+				"          RAISE60SECROP,",
+				"          RAISE5MINRRP,",
+				"          RAISE5MINROP,",
+				"          RAISEREGRRP,",
+				"          RAISEREGROP,",
+				"          LOWER6SECRRP,",
+				"          LOWER6SECROP,",
+				"          LOWER60SECRRP,",
+				"          LOWER60SECROP,",
+				"          LOWER5MINRRP,",
+				"          LOWER5MINROP,",
+				"          LOWERREGRRP,",
+				"          LOWERREGROP,",
+				"          PRICE_STATUS,",
+				"          RAISE1SECRRP,",
+				"          RAISE1SECROP,",
+				"          LOWER1SECRRP,",
+				"          LOWER1SECROP",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectTrading",
+				"sourceDU select(mapColumn(",
+				"          DUID,",
+				"          START_DATE,",
+				"          END_DATE,",
+				"          DISPATCHTYPE,",
+				"          CONNECTIONPOINTID,",
+				"          REGIONID,",
+				"          STATIONID,",
+				"          PARTICIPANTID,",
+				"          LASTCHANGED,",
+				"          TRANSMISSIONLOSSFACTOR,",
+				"          STARTTYPE,",
+				"          DISTRIBUTIONLOSSFACTOR,",
+				"          MINIMUM_ENERGY_PRICE,",
+				"          MAXIMUM_ENERGY_PRICE,",
+				"          SCHEDULE_TYPE,",
+				"          MIN_RAMP_RATE_UP,",
+				"          MIN_RAMP_RATE_DOWN,",
+				"          MAX_RAMP_RATE_UP,",
+				"          MAX_RAMP_RATE_DOWN,",
+				"          IS_AGGREGATED,",
+				"          DISPATCHSUBTYPE,",
+				"          ADG_ID,",
+				"          LOAD_MINIMUM_ENERGY_PRICE,",
+				"          LOAD_MAXIMUM_ENERGY_PRICE,",
+				"          LOAD_MIN_RAMP_RATE_UP,",
+				"          LOAD_MIN_RAMP_RATE_DOWN,",
+				"          LOAD_MAX_RAMP_RATE_UP,",
+				"          LOAD_MAX_RAMP_RATE_DOWN,",
+				"          SECONDARY_TLF",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectDU",
+				"selectTrading cast(output(",
+				"          SETTLEMENTDATE as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 derive() ~> derivedColumn1",
+				"source1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> sink1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink2"
 			]
 		}
 	}
