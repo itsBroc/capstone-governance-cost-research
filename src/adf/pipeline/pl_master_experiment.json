@@ -54,6 +54,40 @@
 														"value": "'@{item().repetition}'",
 														"type": "Expression"
 													}
+												},
+												"datasetParameters": {
+													"sourceREGION": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceTRADING": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceDU": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceSCADA": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sinkSCADA": {
+														"GovernanceMode": "ungoverned",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkTRADING": {
+														"GovernanceMode": "ungoverned",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkREGION": {
+														"GovernanceMode": "ungoverned",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkDU": {
+														"GovernanceMode": "ungoverned",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													}
 												}
 											},
 											"compute": {
@@ -94,10 +128,60 @@
 														"value": "'@{item().repetition}'",
 														"type": "Expression"
 													}
+												},
+												"datasetParameters": {
+													"sourceREGION": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceTRADING": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceDU": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sourceSCADA": {
+														"ScenarioID": "@item().scenario"
+													},
+													"sinkSCADA": {
+														"GovernanceMode": "governed",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkTRADING": {
+														"GovernanceMode": "governed",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkREGION": {
+														"GovernanceMode": "governed",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkDU": {
+														"GovernanceMode": "governed",
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkFaultSCADA": {
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkFaultREGION": {
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkFaultTRADING": {
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													},
+													"sinkFaultDU": {
+														"ScenarioID": "@item().scenario",
+														"Repetition": "@item().repetition"
+													}
 												}
 											},
 											"compute": {
-												"coreCount": 8,
+												"coreCount": 16,
 												"computeType": "General"
 											},
 											"traceLevel": "Fine"
