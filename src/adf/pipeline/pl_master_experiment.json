@@ -40,7 +40,21 @@
 										"typeProperties": {
 											"dataflow": {
 												"referenceName": "df_ungoverned",
-												"type": "DataFlowReference"
+												"type": "DataFlowReference",
+												"parameters": {
+													"GovernanceMode": {
+														"value": "'@{'ungoverned'}'",
+														"type": "Expression"
+													},
+													"ScenarioID": {
+														"value": "'@{item().scenario}'",
+														"type": "Expression"
+													},
+													"Repetition": {
+														"value": "'@{item().repetition}'",
+														"type": "Expression"
+													}
+												}
 											},
 											"compute": {
 												"coreCount": 8,
@@ -64,6 +78,24 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
+											"dataflow": {
+												"referenceName": "df_goverened",
+												"type": "DataFlowReference",
+												"parameters": {
+													"GovernanceMode": {
+														"value": "'@{'governed'}'",
+														"type": "Expression"
+													},
+													"ScenarioID": {
+														"value": "'@{item().scenario}'",
+														"type": "Expression"
+													},
+													"Repetition": {
+														"value": "'@{item().repetition}'",
+														"type": "Expression"
+													}
+												}
+											},
 											"compute": {
 												"coreCount": 8,
 												"computeType": "General"
