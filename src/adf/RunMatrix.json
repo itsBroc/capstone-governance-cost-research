@@ -1,0 +1,182 @@
+[
+  {
+    "scenario": "s0",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s0",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s0",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s0",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s0",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s0",
+    "mode": "governed",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s1",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s1",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s1",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s1",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s1",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s1",
+    "mode": "governed",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s2",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s2",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s2",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s2",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s2",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s2",
+    "mode": "governed",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s3",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s3",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s3",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s3",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s3",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s3",
+    "mode": "governed",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s4",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s4",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s4",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s4",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s4",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s4",
+    "mode": "governed",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s5",
+    "mode": "ungoverned",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s5",
+    "mode": "governed",
+    "repetition": "r1"
+  },
+  {
+    "scenario": "s5",
+    "mode": "ungoverned",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s5",
+    "mode": "governed",
+    "repetition": "r2"
+  },
+  {
+    "scenario": "s5",
+    "mode": "ungoverned",
+    "repetition": "r3"
+  },
+  {
+    "scenario": "s5",
+    "mode": "governed",
+    "repetition": "r3"
+  }
+]
