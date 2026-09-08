@@ -1,0 +1,28 @@
+{
+	"name": "ds_faulty_scada",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_capstone",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ScenarioID": {
+				"type": "string"
+			},
+			"Repetition": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "data-faulty/governed/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA/",
+				"fileSystem": "capstone"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
