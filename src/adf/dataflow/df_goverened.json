@@ -172,6 +172,12 @@
 				},
 				{
 					"name": "filterDuplicateDU"
+				},
+				{
+					"name": "SelectDuplicateDU"
+				},
+				{
+					"name": "castDuplicateDU"
 				}
 			],
 			"scriptLines": [
@@ -544,7 +550,7 @@
 				"     disjoint: false) ~> splitDU@(ValidDU, InvalidDU)",
 				"assertDU aggregate(groupBy(DUID),",
 				"     DUID_COUNT = count()) ~> aggregateDU",
-				"assertDU, filterDuplicateDU join(selectDU@DUID == aggregateDU@DUID,",
+				"assertDU, SelectDuplicateDU join(selectDU@DUID == DUPLICATE_DUID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -562,6 +568,16 @@
 				"          SCENARIO_ID = $ScenarioID,",
 				"          REPETITION = $Repetition) ~> derivedFaultDU",
 				"aggregateDU filter(DUID_COUNT > 1) ~> filterDuplicateDU",
+				"filterDuplicateDU select(mapColumn(",
+				"          DUPLICATE_DUID = DUID,",
+				"          DUID_COUNT",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectDuplicateDU",
+				"SelectDuplicateDU cast(output(",
+				"          DUPLICATE_DUID as string",
+				"     ),",
+				"     errors: true) ~> castDuplicateDU",
 				"derivedSCADA sink(allowSchemaDrift: false,",
 				"     validateSchema: true,",
 				"     input(",
