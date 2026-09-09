@@ -412,7 +412,72 @@
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "DUID",
+						"type": "UTF8"
+					},
+					{
+						"name": "START_DATE",
+						"type": "INT96"
+					},
+					{
+						"name": "END_DATE",
+						"type": "INT96"
+					},
+					{
+						"name": "DISPATCHTYPE",
+						"type": "UTF8"
+					},
+					{
+						"name": "CONNECTIONPOINTID",
+						"type": "UTF8"
+					},
+					{
+						"name": "REGIONID",
+						"type": "UTF8"
+					},
+					{
+						"name": "STATIONID",
+						"type": "UTF8"
+					},
+					{
+						"name": "PARTICIPANTID",
+						"type": "UTF8"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "INT96"
+					},
+					{
+						"name": "TRANSMISSIONLOSSFACTOR",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "DISTRIBUTIONLOSSFACTOR",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "MINIMUM_ENERGY_PRICE",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "MAXIMUM_ENERGY_PRICE",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "SCHEDULE_TYPE",
+						"type": "UTF8"
+					},
+					{
+						"name": "DISPATCHSUBTYPE",
+						"type": "UTF8"
+					},
+					{
+						"name": "PRICE_RANGE",
+						"type": "DOUBLE"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
@@ -451,7 +516,68 @@
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "SETTLEMENTDATE",
+						"type": "INT96"
+					},
+					{
+						"name": "RUNNO",
+						"type": "INT32"
+					},
+					{
+						"name": "REGIONID",
+						"type": "UTF8"
+					},
+					{
+						"name": "DISPATCHINTERVAL",
+						"type": "INT32"
+					},
+					{
+						"name": "TOTALDEMAND",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "AVAILABLEGENERATION",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "AVAILABLELOAD",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "DEMANDFORECAST",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "DISPATCHABLEGENERATION",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "DISPATCHABLELOAD",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "NETINTERCHANGE",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "INT96"
+					},
+					{
+						"name": "TRADE_DATE",
+						"type": "DATE"
+					},
+					{
+						"name": "NET_DEMAND",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "GENERATION_MARGIN",
+						"type": "DOUBLE"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
@@ -490,7 +616,32 @@
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "SETTLEMENTDATE",
+						"type": "INT96"
+					},
+					{
+						"name": "DUID",
+						"type": "UTF8"
+					},
+					{
+						"name": "SCADAVALUE",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "INT96"
+					},
+					{
+						"name": "TRADE_DATE",
+						"type": "DATE"
+					},
+					{
+						"name": "INTERVAL_MWH",
+						"type": "DOUBLE"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
@@ -529,7 +680,56 @@
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "SETTLEMENTDATE",
+						"type": "INT96"
+					},
+					{
+						"name": "RUNNO",
+						"type": "INT32"
+					},
+					{
+						"name": "REGIONID",
+						"type": "UTF8"
+					},
+					{
+						"name": "PERIODID",
+						"type": "INT32"
+					},
+					{
+						"name": "RRP",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "EEP",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "INVALIDFLAG",
+						"type": "INT32"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "INT96"
+					},
+					{
+						"name": "ROP",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "PRICE_STATUS",
+						"type": "UTF8"
+					},
+					{
+						"name": "TRADE_DATE",
+						"type": "DATE"
+					},
+					{
+						"name": "PRICE_SPREAD",
+						"type": "DOUBLE"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
@@ -1636,6 +1836,12 @@
 						},
 						{
 							"name": "filterDuplicateDU"
+						},
+						{
+							"name": "SelectDuplicateDU"
+						},
+						{
+							"name": "castDuplicateDU"
 						}
 					],
 					"scriptLines": [
@@ -1988,27 +2194,27 @@
 						"!isNull(REGIONID), false, 'DU_REQUIRED_FIELDS'),",
 						"     expectTrue(isTimestamp(START_DATE, 'yyyy/MM/dd HH:mm:ss'), false, 'DU_VALID_START_DATE'),",
 						"     expectTrue(isTimestamp(END_DATE, 'yyyy/MM/dd HH:mm:ss'), false, 'DU_VALID_END_DATE')) ~> assertDU",
-						"assertSCADA split(!hasError(),",
+						"assertSCADA split(!hasError('SCADA_REQUIRED_FIELDS') && !hasError('SCADA_VALID_TIMESTAMP') && !hasError('SCADA_NUMERIC_VALUE'),",
 						"     disjoint: false) ~> splitScada@(ValidSCADA, InvalidSCADA)",
 						"splitScada@InvalidSCADA derive(FAULT_SOURCE = 'DISPATCH_UNIT_SCADA',",
 						"          FAULT_REASON = 'SCADA_VALIDATION_FAILED',",
 						"          GOVERNANCE_STATUS = 'REJECTED',",
 						"          SCENARIO_ID = $ScenarioID,",
 						"          REPETITION = $Repetition) ~> derivedFaultSCADA",
-						"assertREGION split(!hasError(),",
+						"assertREGION split(!hasError('REGION_REQUIRED_FIELDS') && !hasError('REGION_VALID_TIMESTAMP') && !hasError('REGION_NUMERIC_DEMAND') && !hasError('REGION_NONNEGATIVE_DEMAND'),",
 						"     disjoint: false) ~> splitREGION@(ValidREGION, InvalidREGION)",
 						"splitREGION@InvalidREGION derive(FAULT_SOURCE = 'DISPATCH_REGION_SUM',",
 						"          FAULT_REASON = 'REGION_VALIDATION_FAILED',",
 						"          GOVERNANCE_STATUS = 'REJECTED',",
 						"          SCENARIO_ID = $ScenarioID,",
 						"          REPETITION = $Repetition) ~> derivedFaultRegion",
-						"assertTRADING split(!hasError(),",
+						"assertTRADING split(!hasError('TRADING_REQUIRED_FIELDS') && !hasError('TRADING_VALID_TIMESTAMP') && !hasError('TRADING_NUMERIC_PRICE'),",
 						"     disjoint: false) ~> split1@(ValidTRADING, InvalidTRADING)",
-						"joinDU split(!hasError() && isNull(DUID_COUNT),",
+						"joinDU split(!hasError('DU_REQUIRED_FIELDS') && !hasError('DU_VALID_START_DATE') && !hasError('DU_VALID_END_DATE') && isNull(DUID_COUNT),",
 						"     disjoint: false) ~> splitDU@(ValidDU, InvalidDU)",
 						"assertDU aggregate(groupBy(DUID),",
 						"     DUID_COUNT = count()) ~> aggregateDU",
-						"assertDU, filterDuplicateDU join(selectDU@DUID == aggregateDU@DUID,",
+						"assertDU, castDuplicateDU join(DUID == DUPLICATE_DUID,",
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
@@ -2026,32 +2232,99 @@
 						"          SCENARIO_ID = $ScenarioID,",
 						"          REPETITION = $Repetition) ~> derivedFaultDU",
 						"aggregateDU filter(DUID_COUNT > 1) ~> filterDuplicateDU",
-						"derivedSCADA sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
+						"filterDuplicateDU select(mapColumn(",
+						"          DUPLICATE_DUID = DUID,",
+						"          DUID_COUNT",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectDuplicateDU",
+						"SelectDuplicateDU cast(output(",
+						"          DUPLICATE_DUID as string",
+						"     ),",
+						"     errors: true) ~> castDuplicateDU",
+						"derivedSCADA sink(allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          DUID as string,",
+						"          SCADAVALUE as double,",
+						"          LASTCHANGED as timestamp,",
+						"          TRADE_DATE as date,",
+						"          INTERVAL_MWH as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> sinkSCADA",
-						"derivedTRADING sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
+						"derivedTRADING sink(allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          PERIODID as integer,",
+						"          RRP as double,",
+						"          EEP as double,",
+						"          INVALIDFLAG as integer,",
+						"          LASTCHANGED as timestamp,",
+						"          ROP as double,",
+						"          PRICE_STATUS as string,",
+						"          TRADE_DATE as date,",
+						"          PRICE_SPREAD as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> sinkTRADING",
-						"derivedREGION sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
+						"derivedREGION sink(allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as integer,",
+						"          TOTALDEMAND as double,",
+						"          AVAILABLEGENERATION as double,",
+						"          AVAILABLELOAD as double,",
+						"          DEMANDFORECAST as double,",
+						"          DISPATCHABLEGENERATION as double,",
+						"          DISPATCHABLELOAD as double,",
+						"          NETINTERCHANGE as double,",
+						"          LASTCHANGED as timestamp,",
+						"          TRADE_DATE as date,",
+						"          NET_DEMAND as double,",
+						"          GENERATION_MARGIN as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> sinkREGION",
-						"derivedDU sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
+						"derivedDU sink(allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     input(",
+						"          DUID as string,",
+						"          START_DATE as timestamp,",
+						"          END_DATE as timestamp,",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as timestamp,",
+						"          TRANSMISSIONLOSSFACTOR as double,",
+						"          DISTRIBUTIONLOSSFACTOR as double,",
+						"          MINIMUM_ENERGY_PRICE as double,",
+						"          MAXIMUM_ENERGY_PRICE as double,",
+						"          SCHEDULE_TYPE as string,",
+						"          DISPATCHSUBTYPE as string,",
+						"          PRICE_RANGE as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -2549,6 +2822,14 @@
 						"castDU derive(PRICE_RANGE = MAXIMUM_ENERGY_PRICE - MINIMUM_ENERGY_PRICE) ~> derivedDU",
 						"derivedSCADA sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          DUID as string,",
+						"          SCADAVALUE as double,",
+						"          LASTCHANGED as timestamp,",
+						"          TRADE_DATE as date,",
+						"          INTERVAL_MWH as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -2557,6 +2838,20 @@
 						"     skipDuplicateMapOutputs: true) ~> sinkSCADA",
 						"derivedTrading sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          PERIODID as integer,",
+						"          RRP as double,",
+						"          EEP as double,",
+						"          INVALIDFLAG as integer,",
+						"          LASTCHANGED as timestamp,",
+						"          ROP as double,",
+						"          PRICE_STATUS as string,",
+						"          TRADE_DATE as date,",
+						"          PRICE_SPREAD as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -2565,6 +2860,23 @@
 						"     skipDuplicateMapOutputs: true) ~> sinkTRADING",
 						"derivedREGION sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     input(",
+						"          SETTLEMENTDATE as timestamp,",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as integer,",
+						"          TOTALDEMAND as double,",
+						"          AVAILABLEGENERATION as double,",
+						"          AVAILABLELOAD as double,",
+						"          DEMANDFORECAST as double,",
+						"          DISPATCHABLEGENERATION as double,",
+						"          DISPATCHABLELOAD as double,",
+						"          NETINTERCHANGE as double,",
+						"          LASTCHANGED as timestamp,",
+						"          TRADE_DATE as date,",
+						"          NET_DEMAND as double,",
+						"          GENERATION_MARGIN as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -2573,6 +2885,24 @@
 						"     skipDuplicateMapOutputs: true) ~> sinkREGION",
 						"derivedDU sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     input(",
+						"          DUID as string,",
+						"          START_DATE as timestamp,",
+						"          END_DATE as timestamp,",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as timestamp,",
+						"          TRANSMISSIONLOSSFACTOR as double,",
+						"          DISTRIBUTIONLOSSFACTOR as double,",
+						"          MINIMUM_ENERGY_PRICE as double,",
+						"          MAXIMUM_ENERGY_PRICE as double,",
+						"          SCHEDULE_TYPE as string,",
+						"          DISPATCHSUBTYPE as string,",
+						"          PRICE_RANGE as double",
+						"     ),",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
