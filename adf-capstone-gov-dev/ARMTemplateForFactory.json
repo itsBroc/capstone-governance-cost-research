@@ -21,7 +21,222 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_faulty_csv')]",
+			"name": "[concat(parameters('factoryName'), '/pl_master_experiment')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach_ExperimentRun",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.RunMatrix",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "If_Governed",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(item().mode, 'governed')",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "Run_Ungoverned",
+												"type": "ExecuteDataFlow",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataflow": {
+														"referenceName": "df_ungoverned",
+														"type": "DataFlowReference",
+														"parameters": {
+															"GovernanceMode": {
+																"value": "'@{'ungoverned'}'",
+																"type": "Expression"
+															},
+															"ScenarioID": {
+																"value": "'@{item().scenario}'",
+																"type": "Expression"
+															},
+															"Repetition": {
+																"value": "'@{item().repetition}'",
+																"type": "Expression"
+															}
+														},
+														"datasetParameters": {
+															"sourceREGION": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceTRADING": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceDU": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceSCADA": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sinkSCADA": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkTRADING": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkREGION": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkDU": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															}
+														}
+													},
+													"staging": {},
+													"compute": {
+														"coreCount": 16,
+														"computeType": "General"
+													},
+													"traceLevel": "Fine"
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "Run_Governed",
+												"type": "ExecuteDataFlow",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataflow": {
+														"referenceName": "df_goverened",
+														"type": "DataFlowReference",
+														"parameters": {
+															"GovernanceMode": {
+																"value": "'@{'governed'}'",
+																"type": "Expression"
+															},
+															"ScenarioID": {
+																"value": "'@{item().scenario}'",
+																"type": "Expression"
+															},
+															"Repetition": {
+																"value": "'@{item().repetition}'",
+																"type": "Expression"
+															}
+														},
+														"datasetParameters": {
+															"sourceREGION": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceTRADING": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceDU": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceSCADA": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sinkSCADA": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkTRADING": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkREGION": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkDU": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultSCADA": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultREGION": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultTRADING": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultDU": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															}
+														}
+													},
+													"staging": {},
+													"compute": {
+														"coreCount": 16,
+														"computeType": "General"
+													},
+													"traceLevel": "Fine"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"RunMatrix": {
+						"type": "array"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_ungoverned')]",
+				"[concat(variables('factoryId'), '/dataflows/df_goverened')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_faulty_du')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -30,13 +245,307 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"GovernanceTier": {
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-faulty/governed/@{dataset().ScenarioID}/@{dataset().Repetition}/DU_DETAIL_SUMMARY/",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_faulty_region')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-faulty/governed/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_REGION_SUM/",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_faulty_scada')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-faulty/governed/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA/",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_faulty_trading')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-faulty/governed/@{dataset().ScenarioID}/@{dataset().Repetition}/TRADING_PRICE/",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_processed_du')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"GovernanceMode": {
 						"type": "string"
 					},
 					"ScenarioID": {
 						"type": "string"
 					},
-					"TableName": {
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DU_DETAIL_SUMMARY",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_processed_region')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"GovernanceMode": {
+						"type": "string"
+					},
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_REGION_SUM",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_processed_scada')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"GovernanceMode": {
+						"type": "string"
+					},
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_processed_trading')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"GovernanceMode": {
+						"type": "string"
+					},
+					"ScenarioID": {
+						"type": "string"
+					},
+					"Repetition": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/TRADING_PRICE",
+							"type": "Expression"
+						},
+						"fileSystem": "capstone"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_raw_du')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
 						"type": "string"
 					}
 				},
@@ -45,12 +554,161 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@{dataset().TableName}.csv",
+						"folderPath": {
+							"value": "data-raw/@{dataset().ScenarioID}/DU_DETAIL_SUMMARY/",
 							"type": "Expression"
 						},
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DUID",
+						"type": "String"
+					},
+					{
+						"name": "START_DATE",
+						"type": "String"
+					},
+					{
+						"name": "END_DATE",
+						"type": "String"
+					},
+					{
+						"name": "DISPATCHTYPE",
+						"type": "String"
+					},
+					{
+						"name": "CONNECTIONPOINTID",
+						"type": "String"
+					},
+					{
+						"name": "REGIONID",
+						"type": "String"
+					},
+					{
+						"name": "STATIONID",
+						"type": "String"
+					},
+					{
+						"name": "PARTICIPANTID",
+						"type": "String"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "String"
+					},
+					{
+						"name": "TRANSMISSIONLOSSFACTOR",
+						"type": "String"
+					},
+					{
+						"name": "STARTTYPE",
+						"type": "String"
+					},
+					{
+						"name": "DISTRIBUTIONLOSSFACTOR",
+						"type": "String"
+					},
+					{
+						"name": "MINIMUM_ENERGY_PRICE",
+						"type": "String"
+					},
+					{
+						"name": "MAXIMUM_ENERGY_PRICE",
+						"type": "String"
+					},
+					{
+						"name": "SCHEDULE_TYPE",
+						"type": "String"
+					},
+					{
+						"name": "MIN_RAMP_RATE_UP",
+						"type": "String"
+					},
+					{
+						"name": "MIN_RAMP_RATE_DOWN",
+						"type": "String"
+					},
+					{
+						"name": "MAX_RAMP_RATE_UP",
+						"type": "String"
+					},
+					{
+						"name": "MAX_RAMP_RATE_DOWN",
+						"type": "String"
+					},
+					{
+						"name": "IS_AGGREGATED",
+						"type": "String"
+					},
+					{
+						"name": "DISPATCHSUBTYPE",
+						"type": "String"
+					},
+					{
+						"name": "ADG_ID",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MINIMUM_ENERGY_PRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MAXIMUM_ENERGY_PRICE",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MIN_RAMP_RATE_UP",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MIN_RAMP_RATE_DOWN",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MAX_RAMP_RATE_UP",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_MAX_RAMP_RATE_DOWN",
+						"type": "String"
+					},
+					{
+						"name": "SECONDARY_TLF",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_raw_region')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
 						"folderPath": {
-							"value": "data-faulty/@{dataset().GovernanceTier}/@{dataset().ScenarioID}",
+							"value": "data-raw/@{dataset().ScenarioID}/DISPATCH_REGION_SUM/",
 							"type": "Expression"
 						},
 						"fileSystem": "capstone"
@@ -576,7 +1234,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_processed_parquet')]",
+			"name": "[concat(parameters('factoryName'), '/ds_raw_scada')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -585,52 +1243,6 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"GovernanceTier": {
-						"type": "string"
-					},
-					"ScenarioID": {
-						"type": "string"
-					},
-					"TableName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@{dataset().TableName}.parquet",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "data-processed/@{dataset().GovernanceTier}/@{dataset().ScenarioID}",
-							"type": "Expression"
-						},
-						"fileSystem": "capstone"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_raw')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_adls_capstone",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string"
-					},
 					"ScenarioID": {
 						"type": "string"
 					}
@@ -640,12 +1252,61 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@{dataset().TableName}.csv",
+						"folderPath": {
+							"value": "data-raw/@{dataset().ScenarioID}/DISPATCH_UNIT_SCADA/",
 							"type": "Expression"
 						},
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "SETTLEMENTDATE",
+						"type": "String"
+					},
+					{
+						"name": "DUID",
+						"type": "String"
+					},
+					{
+						"name": "SCADAVALUE",
+						"type": "String"
+					},
+					{
+						"name": "LASTCHANGED",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_raw_trading')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ScenarioID": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
 						"folderPath": {
-							"value": "data-raw/@{if(equals(dataset().ScenarioID, 's0'), 'clean', concat('fault-injection/', dataset().ScenarioID))}",
+							"value": "data-raw/@{dataset().ScenarioID}/TRADING_PRICE/",
 							"type": "Expression"
 						},
 						"fileSystem": "capstone"
@@ -669,243 +1330,19 @@
 						"type": "String"
 					},
 					{
-						"name": "DISPATCHINTERVAL",
+						"name": "PERIODID",
 						"type": "String"
 					},
 					{
-						"name": "INTERVENTION",
+						"name": "RRP",
 						"type": "String"
 					},
 					{
-						"name": "TOTALDEMAND",
+						"name": "EEP",
 						"type": "String"
 					},
 					{
-						"name": "AVAILABLEGENERATION",
-						"type": "String"
-					},
-					{
-						"name": "AVAILABLELOAD",
-						"type": "String"
-					},
-					{
-						"name": "DEMANDFORECAST",
-						"type": "String"
-					},
-					{
-						"name": "DISPATCHABLEGENERATION",
-						"type": "String"
-					},
-					{
-						"name": "DISPATCHABLELOAD",
-						"type": "String"
-					},
-					{
-						"name": "NETINTERCHANGE",
-						"type": "String"
-					},
-					{
-						"name": "EXCESSGENERATION",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECPRICE",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECREQ",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECIMPORT",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECLOCALPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECLOCALREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECPRICE",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECREQ",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECSUPPLYPRICE",
-						"type": "String"
-					},
-					{
-						"name": "AGGEGATEDISPATCHERROR",
-						"type": "String"
-					},
-					{
-						"name": "AGGREGATEDISPATCHERROR",
+						"name": "INVALIDFLAG",
 						"type": "String"
 					},
 					{
@@ -913,255 +1350,91 @@
 						"type": "String"
 					},
 					{
-						"name": "INITIALSUPPLY",
+						"name": "ROP",
 						"type": "String"
 					},
 					{
-						"name": "CLEAREDSUPPLY",
+						"name": "RAISE6SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "LOWERREGIMPORT",
+						"name": "RAISE6SECROP",
 						"type": "String"
 					},
 					{
-						"name": "LOWERREGLOCALDISPATCH",
+						"name": "RAISE60SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "LOWERREGLOCALREQ",
+						"name": "RAISE60SECROP",
 						"type": "String"
 					},
 					{
-						"name": "LOWERREGREQ",
+						"name": "RAISE5MINRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGIMPORT",
+						"name": "RAISE5MINROP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGLOCALDISPATCH",
+						"name": "RAISEREGRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGLOCALREQ",
+						"name": "RAISEREGROP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGREQ",
+						"name": "LOWER6SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISE5MINLOCALVIOLATION",
+						"name": "LOWER6SECROP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGLOCALVIOLATION",
+						"name": "LOWER60SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISE60SECLOCALVIOLATION",
+						"name": "LOWER60SECROP",
 						"type": "String"
 					},
 					{
-						"name": "RAISE6SECLOCALVIOLATION",
+						"name": "LOWER5MINRRP",
 						"type": "String"
 					},
 					{
-						"name": "LOWER5MINLOCALVIOLATION",
+						"name": "LOWER5MINROP",
 						"type": "String"
 					},
 					{
-						"name": "LOWERREGLOCALVIOLATION",
+						"name": "LOWERREGRRP",
 						"type": "String"
 					},
 					{
-						"name": "LOWER60SECLOCALVIOLATION",
+						"name": "LOWERREGROP",
 						"type": "String"
 					},
 					{
-						"name": "LOWER6SECLOCALVIOLATION",
+						"name": "PRICE_STATUS",
 						"type": "String"
 					},
 					{
-						"name": "RAISE5MINVIOLATION",
+						"name": "RAISE1SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISEREGVIOLATION",
+						"name": "RAISE1SECROP",
 						"type": "String"
 					},
 					{
-						"name": "RAISE60SECVIOLATION",
+						"name": "LOWER1SECRRP",
 						"type": "String"
 					},
 					{
-						"name": "RAISE6SECVIOLATION",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINVIOLATION",
-						"type": "String"
-					},
-					{
-						"name": "LOWERREGVIOLATION",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECVIOLATION",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECVIOLATION",
-						"type": "String"
-					},
-					{
-						"name": "RAISE6SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "RAISE60SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "RAISE5MINACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "RAISEREGACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LOWER6SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LOWER60SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LOWER5MINACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LOWERREGACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LORSURPLUS",
-						"type": "String"
-					},
-					{
-						"name": "LRCSURPLUS",
-						"type": "String"
-					},
-					{
-						"name": "TOTALINTERMITTENTGENERATION",
-						"type": "String"
-					},
-					{
-						"name": "DEMAND_AND_NONSCHEDGEN",
-						"type": "String"
-					},
-					{
-						"name": "UIGF",
-						"type": "String"
-					},
-					{
-						"name": "SEMISCHEDULE_CLEAREDMW",
-						"type": "String"
-					},
-					{
-						"name": "SEMISCHEDULE_COMPLIANCEMW",
-						"type": "String"
-					},
-					{
-						"name": "SS_SOLAR_UIGF",
-						"type": "String"
-					},
-					{
-						"name": "SS_WIND_UIGF",
-						"type": "String"
-					},
-					{
-						"name": "SS_SOLAR_CLEAREDMW",
-						"type": "String"
-					},
-					{
-						"name": "SS_WIND_CLEAREDMW",
-						"type": "String"
-					},
-					{
-						"name": "SS_SOLAR_COMPLIANCEMW",
-						"type": "String"
-					},
-					{
-						"name": "SS_WIND_COMPLIANCEMW",
-						"type": "String"
-					},
-					{
-						"name": "WDR_INITIALMW",
-						"type": "String"
-					},
-					{
-						"name": "WDR_AVAILABLE",
-						"type": "String"
-					},
-					{
-						"name": "WDR_DISPATCHED",
-						"type": "String"
-					},
-					{
-						"name": "SS_SOLAR_AVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "SS_WIND_AVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "RAISE1SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "LOWER1SECLOCALDISPATCH",
-						"type": "String"
-					},
-					{
-						"name": "RAISE1SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "LOWER1SECACTUALAVAILABILITY",
-						"type": "String"
-					},
-					{
-						"name": "BDU_ENERGY_STORAGE",
-						"type": "String"
-					},
-					{
-						"name": "BDU_MIN_AVAIL",
-						"type": "String"
-					},
-					{
-						"name": "BDU_MAX_AVAIL",
-						"type": "String"
-					},
-					{
-						"name": "BDU_CLEAREDMW_GEN",
-						"type": "String"
-					},
-					{
-						"name": "BDU_CLEAREDMW_LOAD",
-						"type": "String"
-					},
-					{
-						"name": "BDU_INITIAL_ENERGY_STORAGE",
-						"type": "String"
-					},
-					{
-						"name": "DECGEN_INITIAL_ENERGY_STORAGE",
+						"name": "LOWER1SECROP",
 						"type": "String"
 					}
 				]
@@ -1188,6 +1461,654 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/df_goverened')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_raw_region",
+								"type": "DatasetReference"
+							},
+							"name": "sourceREGION"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_trading",
+								"type": "DatasetReference"
+							},
+							"name": "sourceTRADING"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_du",
+								"type": "DatasetReference"
+							},
+							"name": "sourceDU"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_scada",
+								"type": "DatasetReference"
+							},
+							"name": "sourceSCADA"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_processed_scada",
+								"type": "DatasetReference"
+							},
+							"name": "sinkSCADA"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_trading",
+								"type": "DatasetReference"
+							},
+							"name": "sinkTRADING"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_region",
+								"type": "DatasetReference"
+							},
+							"name": "sinkREGION"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_du",
+								"type": "DatasetReference"
+							},
+							"name": "sinkDU"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_faulty_scada",
+								"type": "DatasetReference"
+							},
+							"name": "sinkFaultSCADA"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_faulty_region",
+								"type": "DatasetReference"
+							},
+							"name": "sinkFaultREGION"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_faulty_trading",
+								"type": "DatasetReference"
+							},
+							"name": "sinkFaultTRADING"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_faulty_du",
+								"type": "DatasetReference"
+							},
+							"name": "sinkFaultDU"
+						}
+					],
+					"transformations": [
+						{
+							"name": "selectREGION"
+						},
+						{
+							"name": "selectTRADING"
+						},
+						{
+							"name": "selectDU"
+						},
+						{
+							"name": "castTRADING"
+						},
+						{
+							"name": "derivedTRADING"
+						},
+						{
+							"name": "selectSCADA"
+						},
+						{
+							"name": "castSCADA"
+						},
+						{
+							"name": "derivedSCADA"
+						},
+						{
+							"name": "castREGION"
+						},
+						{
+							"name": "derivedREGION"
+						},
+						{
+							"name": "castDU"
+						},
+						{
+							"name": "derivedDU"
+						},
+						{
+							"name": "assertSCADA"
+						},
+						{
+							"name": "assertREGION"
+						},
+						{
+							"name": "assertTRADING"
+						},
+						{
+							"name": "assertDU"
+						},
+						{
+							"name": "splitScada"
+						},
+						{
+							"name": "derivedFaultSCADA"
+						},
+						{
+							"name": "splitREGION"
+						},
+						{
+							"name": "derivedFaultRegion"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "splitDU"
+						},
+						{
+							"name": "aggregateDU"
+						},
+						{
+							"name": "joinDU"
+						},
+						{
+							"name": "derivedFaultTRADING"
+						},
+						{
+							"name": "derivedFaultDU"
+						},
+						{
+							"name": "filterDuplicateDU"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     GovernanceMode as string,",
+						"     ScenarioID as string,",
+						"     Repetition as string",
+						"}",
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          RUNNO as string,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as string,",
+						"          INTERVENTION as string,",
+						"          TOTALDEMAND as string,",
+						"          AVAILABLEGENERATION as string,",
+						"          AVAILABLELOAD as string,",
+						"          DEMANDFORECAST as string,",
+						"          DISPATCHABLEGENERATION as string,",
+						"          DISPATCHABLELOAD as string,",
+						"          NETINTERCHANGE as string,",
+						"          EXCESSGENERATION as string,",
+						"          LOWER5MINDISPATCH as string,",
+						"          LOWER5MINIMPORT as string,",
+						"          LOWER5MINLOCALDISPATCH as string,",
+						"          LOWER5MINLOCALPRICE as string,",
+						"          LOWER5MINLOCALREQ as string,",
+						"          LOWER5MINPRICE as string,",
+						"          LOWER5MINREQ as string,",
+						"          LOWER5MINSUPPLYPRICE as string,",
+						"          LOWER60SECDISPATCH as string,",
+						"          LOWER60SECIMPORT as string,",
+						"          LOWER60SECLOCALDISPATCH as string,",
+						"          LOWER60SECLOCALPRICE as string,",
+						"          LOWER60SECLOCALREQ as string,",
+						"          LOWER60SECPRICE as string,",
+						"          LOWER60SECREQ as string,",
+						"          LOWER60SECSUPPLYPRICE as string,",
+						"          LOWER6SECDISPATCH as string,",
+						"          LOWER6SECIMPORT as string,",
+						"          LOWER6SECLOCALDISPATCH as string,",
+						"          LOWER6SECLOCALPRICE as string,",
+						"          LOWER6SECLOCALREQ as string,",
+						"          LOWER6SECPRICE as string,",
+						"          LOWER6SECREQ as string,",
+						"          LOWER6SECSUPPLYPRICE as string,",
+						"          RAISE5MINDISPATCH as string,",
+						"          RAISE5MINIMPORT as string,",
+						"          RAISE5MINLOCALDISPATCH as string,",
+						"          RAISE5MINLOCALPRICE as string,",
+						"          RAISE5MINLOCALREQ as string,",
+						"          RAISE5MINPRICE as string,",
+						"          RAISE5MINREQ as string,",
+						"          RAISE5MINSUPPLYPRICE as string,",
+						"          RAISE60SECDISPATCH as string,",
+						"          RAISE60SECIMPORT as string,",
+						"          RAISE60SECLOCALDISPATCH as string,",
+						"          RAISE60SECLOCALPRICE as string,",
+						"          RAISE60SECLOCALREQ as string,",
+						"          RAISE60SECPRICE as string,",
+						"          RAISE60SECREQ as string,",
+						"          RAISE60SECSUPPLYPRICE as string,",
+						"          RAISE6SECDISPATCH as string,",
+						"          RAISE6SECIMPORT as string,",
+						"          RAISE6SECLOCALDISPATCH as string,",
+						"          RAISE6SECLOCALPRICE as string,",
+						"          RAISE6SECLOCALREQ as string,",
+						"          RAISE6SECPRICE as string,",
+						"          RAISE6SECREQ as string,",
+						"          RAISE6SECSUPPLYPRICE as string,",
+						"          AGGEGATEDISPATCHERROR as string,",
+						"          AGGREGATEDISPATCHERROR as string,",
+						"          LASTCHANGED as string,",
+						"          INITIALSUPPLY as string,",
+						"          CLEAREDSUPPLY as string,",
+						"          LOWERREGIMPORT as string,",
+						"          LOWERREGLOCALDISPATCH as string,",
+						"          LOWERREGLOCALREQ as string,",
+						"          LOWERREGREQ as string,",
+						"          RAISEREGIMPORT as string,",
+						"          RAISEREGLOCALDISPATCH as string,",
+						"          RAISEREGLOCALREQ as string,",
+						"          RAISEREGREQ as string,",
+						"          RAISE5MINLOCALVIOLATION as string,",
+						"          RAISEREGLOCALVIOLATION as string,",
+						"          RAISE60SECLOCALVIOLATION as string,",
+						"          RAISE6SECLOCALVIOLATION as string,",
+						"          LOWER5MINLOCALVIOLATION as string,",
+						"          LOWERREGLOCALVIOLATION as string,",
+						"          LOWER60SECLOCALVIOLATION as string,",
+						"          LOWER6SECLOCALVIOLATION as string,",
+						"          RAISE5MINVIOLATION as string,",
+						"          RAISEREGVIOLATION as string,",
+						"          RAISE60SECVIOLATION as string,",
+						"          RAISE6SECVIOLATION as string,",
+						"          LOWER5MINVIOLATION as string,",
+						"          LOWERREGVIOLATION as string,",
+						"          LOWER60SECVIOLATION as string,",
+						"          LOWER6SECVIOLATION as string,",
+						"          RAISE6SECACTUALAVAILABILITY as string,",
+						"          RAISE60SECACTUALAVAILABILITY as string,",
+						"          RAISE5MINACTUALAVAILABILITY as string,",
+						"          RAISEREGACTUALAVAILABILITY as string,",
+						"          LOWER6SECACTUALAVAILABILITY as string,",
+						"          LOWER60SECACTUALAVAILABILITY as string,",
+						"          LOWER5MINACTUALAVAILABILITY as string,",
+						"          LOWERREGACTUALAVAILABILITY as string,",
+						"          LORSURPLUS as string,",
+						"          LRCSURPLUS as string,",
+						"          TOTALINTERMITTENTGENERATION as string,",
+						"          DEMAND_AND_NONSCHEDGEN as string,",
+						"          UIGF as string,",
+						"          SEMISCHEDULE_CLEAREDMW as string,",
+						"          SEMISCHEDULE_COMPLIANCEMW as string,",
+						"          SS_SOLAR_UIGF as string,",
+						"          SS_WIND_UIGF as string,",
+						"          SS_SOLAR_CLEAREDMW as string,",
+						"          SS_WIND_CLEAREDMW as string,",
+						"          SS_SOLAR_COMPLIANCEMW as string,",
+						"          SS_WIND_COMPLIANCEMW as string,",
+						"          WDR_INITIALMW as string,",
+						"          WDR_AVAILABLE as string,",
+						"          WDR_DISPATCHED as string,",
+						"          SS_SOLAR_AVAILABILITY as string,",
+						"          SS_WIND_AVAILABILITY as string,",
+						"          RAISE1SECLOCALDISPATCH as string,",
+						"          LOWER1SECLOCALDISPATCH as string,",
+						"          RAISE1SECACTUALAVAILABILITY as string,",
+						"          LOWER1SECACTUALAVAILABILITY as string,",
+						"          BDU_ENERGY_STORAGE as string,",
+						"          BDU_MIN_AVAIL as string,",
+						"          BDU_MAX_AVAIL as string,",
+						"          BDU_CLEAREDMW_GEN as string,",
+						"          BDU_CLEAREDMW_LOAD as string,",
+						"          BDU_INITIAL_ENERGY_STORAGE as string,",
+						"          DECGEN_INITIAL_ENERGY_STORAGE as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     ignoreNoFilesFound: false) ~> sourceREGION",
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          RUNNO as string,",
+						"          REGIONID as string,",
+						"          PERIODID as string,",
+						"          RRP as string,",
+						"          EEP as string,",
+						"          INVALIDFLAG as string,",
+						"          LASTCHANGED as string,",
+						"          ROP as string,",
+						"          RAISE6SECRRP as string,",
+						"          RAISE6SECROP as string,",
+						"          RAISE60SECRRP as string,",
+						"          RAISE60SECROP as string,",
+						"          RAISE5MINRRP as string,",
+						"          RAISE5MINROP as string,",
+						"          RAISEREGRRP as string,",
+						"          RAISEREGROP as string,",
+						"          LOWER6SECRRP as string,",
+						"          LOWER6SECROP as string,",
+						"          LOWER60SECRRP as string,",
+						"          LOWER60SECROP as string,",
+						"          LOWER5MINRRP as string,",
+						"          LOWER5MINROP as string,",
+						"          LOWERREGRRP as string,",
+						"          LOWERREGROP as string,",
+						"          PRICE_STATUS as string,",
+						"          RAISE1SECRRP as string,",
+						"          RAISE1SECROP as string,",
+						"          LOWER1SECRRP as string,",
+						"          LOWER1SECROP as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     ignoreNoFilesFound: false) ~> sourceTRADING",
+						"source(output(",
+						"          DUID as string,",
+						"          START_DATE as string,",
+						"          END_DATE as string,",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as string,",
+						"          TRANSMISSIONLOSSFACTOR as string,",
+						"          STARTTYPE as string,",
+						"          DISTRIBUTIONLOSSFACTOR as string,",
+						"          MINIMUM_ENERGY_PRICE as string,",
+						"          MAXIMUM_ENERGY_PRICE as string,",
+						"          SCHEDULE_TYPE as string,",
+						"          MIN_RAMP_RATE_UP as string,",
+						"          MIN_RAMP_RATE_DOWN as string,",
+						"          MAX_RAMP_RATE_UP as string,",
+						"          MAX_RAMP_RATE_DOWN as string,",
+						"          IS_AGGREGATED as string,",
+						"          DISPATCHSUBTYPE as string,",
+						"          ADG_ID as string,",
+						"          LOAD_MINIMUM_ENERGY_PRICE as string,",
+						"          LOAD_MAXIMUM_ENERGY_PRICE as string,",
+						"          LOAD_MIN_RAMP_RATE_UP as string,",
+						"          LOAD_MIN_RAMP_RATE_DOWN as string,",
+						"          LOAD_MAX_RAMP_RATE_UP as string,",
+						"          LOAD_MAX_RAMP_RATE_DOWN as string,",
+						"          SECONDARY_TLF as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     ignoreNoFilesFound: false) ~> sourceDU",
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          DUID as string,",
+						"          SCADAVALUE as string,",
+						"          LASTCHANGED as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: true,",
+						"     ignoreNoFilesFound: false) ~> sourceSCADA",
+						"sourceREGION select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          RUNNO,",
+						"          REGIONID,",
+						"          DISPATCHINTERVAL,",
+						"          TOTALDEMAND,",
+						"          AVAILABLEGENERATION,",
+						"          AVAILABLELOAD,",
+						"          DEMANDFORECAST,",
+						"          DISPATCHABLEGENERATION,",
+						"          DISPATCHABLELOAD,",
+						"          NETINTERCHANGE,",
+						"          LASTCHANGED",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectREGION",
+						"sourceTRADING select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          RUNNO,",
+						"          REGIONID,",
+						"          PERIODID,",
+						"          RRP,",
+						"          EEP,",
+						"          INVALIDFLAG,",
+						"          LASTCHANGED,",
+						"          ROP,",
+						"          PRICE_STATUS",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectTRADING",
+						"sourceDU select(mapColumn(",
+						"          DUID,",
+						"          START_DATE,",
+						"          END_DATE,",
+						"          DISPATCHTYPE,",
+						"          CONNECTIONPOINTID,",
+						"          REGIONID,",
+						"          STATIONID,",
+						"          PARTICIPANTID,",
+						"          LASTCHANGED,",
+						"          TRANSMISSIONLOSSFACTOR,",
+						"          DISTRIBUTIONLOSSFACTOR,",
+						"          MINIMUM_ENERGY_PRICE,",
+						"          MAXIMUM_ENERGY_PRICE,",
+						"          SCHEDULE_TYPE,",
+						"          DISPATCHSUBTYPE",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectDU",
+						"split1@ValidTRADING cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          PERIODID as integer,",
+						"          RRP as double,",
+						"          EEP as double,",
+						"          INVALIDFLAG as integer,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          ROP as double,",
+						"          PRICE_STATUS as string",
+						"     ),",
+						"     errors: false) ~> castTRADING",
+						"castTRADING derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          PRICE_SPREAD = RRP - ROP) ~> derivedTRADING",
+						"sourceSCADA select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          DUID,",
+						"          SCADAVALUE,",
+						"          LASTCHANGED",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectSCADA",
+						"splitScada@ValidSCADA cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          DUID as string,",
+						"          SCADAVALUE as double,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss'",
+						"     ),",
+						"     errors: false) ~> castSCADA",
+						"castSCADA derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          INTERVAL_MWH = SCADAVALUE * (5.0 / 60.0)) ~> derivedSCADA",
+						"splitREGION@ValidREGION cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as integer,",
+						"          TOTALDEMAND as double,",
+						"          AVAILABLEGENERATION as double,",
+						"          AVAILABLELOAD as double,",
+						"          DEMANDFORECAST as double,",
+						"          DISPATCHABLEGENERATION as double,",
+						"          DISPATCHABLELOAD as double,",
+						"          NETINTERCHANGE as double,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss'",
+						"     ),",
+						"     errors: false) ~> castREGION",
+						"castREGION derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          NET_DEMAND = TOTALDEMAND - NETINTERCHANGE,",
+						"          GENERATION_MARGIN = AVAILABLEGENERATION - TOTALDEMAND) ~> derivedREGION",
+						"splitDU@ValidDU cast(output(",
+						"          DUID as string,",
+						"          START_DATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          END_DATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          TRANSMISSIONLOSSFACTOR as double,",
+						"          DISTRIBUTIONLOSSFACTOR as double,",
+						"          MINIMUM_ENERGY_PRICE as double,",
+						"          MAXIMUM_ENERGY_PRICE as double,",
+						"          SCHEDULE_TYPE as string,",
+						"          DISPATCHSUBTYPE as string",
+						"     ),",
+						"     errors: false) ~> castDU",
+						"castDU derive(PRICE_RANGE = MAXIMUM_ENERGY_PRICE - MINIMUM_ENERGY_PRICE) ~> derivedDU",
+						"selectSCADA assert(expectTrue(!isNull(SETTLEMENTDATE) && !isNull(DUID) && !isNull(SCADAVALUE), false, 'SCADA_REQUIRED_FIELDS'),",
+						"     expectTrue(isTimestamp(SETTLEMENTDATE, 'yyyy/MM/dd HH:mm:ss'), false, 'SCADA_VALID_TIMESTAMP'),",
+						"     expectTrue(isDouble(SCADAVALUE), false, 'SCADA_NUMERIC_VALUE')) ~> assertSCADA",
+						"selectREGION assert(expectTrue(!isNull(SETTLEMENTDATE) && !isNull(REGIONID) && !isNull(TOTALDEMAND) && !isNull(NETINTERCHANGE), false, 'REGION_REQUIRED_FIELDS'),",
+						"     expectTrue(isTimestamp(SETTLEMENTDATE, 'yyyy/MM/dd HH:mm:ss'), false, 'REGION_VALID_TIMESTAMP'),",
+						"     expectTrue(isDouble(TOTALDEMAND) && isDouble(NETINTERCHANGE) && isDouble(AVAILABLEGENERATION), false, 'REGION_NUMERIC_DEMAND'),",
+						"     expectTrue(toDouble(TOTALDEMAND) >= 0, false, 'REGION_NONNEGATIVE_DEMAND')) ~> assertREGION",
+						"selectTRADING assert(expectTrue(!isNull(SETTLEMENTDATE) && !isNull(REGIONID) && !isNull(RRP), false, 'TRADING_REQUIRED_FIELDS'),",
+						"     expectTrue(isTimestamp(SETTLEMENTDATE, 'yyyy/MM/dd HH:mm:ss'), false, 'TRADING_VALID_TIMESTAMP'),",
+						"     expectTrue(isDouble(RRP) && (isNull(ROP) || isDouble(ROP)), false, 'TRADING_NUMERIC_PRICE')) ~> assertTRADING",
+						"selectDU assert(expectTrue(!isNull(DUID) &&\r",
+						"!isNull(START_DATE) &&\r",
+						"!isNull(END_DATE) &&\r",
+						"!isNull(REGIONID), false, 'DU_REQUIRED_FIELDS'),",
+						"     expectTrue(isTimestamp(START_DATE, 'yyyy/MM/dd HH:mm:ss'), false, 'DU_VALID_START_DATE'),",
+						"     expectTrue(isTimestamp(END_DATE, 'yyyy/MM/dd HH:mm:ss'), false, 'DU_VALID_END_DATE')) ~> assertDU",
+						"assertSCADA split(!hasError(),",
+						"     disjoint: false) ~> splitScada@(ValidSCADA, InvalidSCADA)",
+						"splitScada@InvalidSCADA derive(FAULT_SOURCE = 'DISPATCH_UNIT_SCADA',",
+						"          FAULT_REASON = 'SCADA_VALIDATION_FAILED',",
+						"          GOVERNANCE_STATUS = 'REJECTED',",
+						"          SCENARIO_ID = $ScenarioID,",
+						"          REPETITION = $Repetition) ~> derivedFaultSCADA",
+						"assertREGION split(!hasError(),",
+						"     disjoint: false) ~> splitREGION@(ValidREGION, InvalidREGION)",
+						"splitREGION@InvalidREGION derive(FAULT_SOURCE = 'DISPATCH_REGION_SUM',",
+						"          FAULT_REASON = 'REGION_VALIDATION_FAILED',",
+						"          GOVERNANCE_STATUS = 'REJECTED',",
+						"          SCENARIO_ID = $ScenarioID,",
+						"          REPETITION = $Repetition) ~> derivedFaultRegion",
+						"assertTRADING split(!hasError(),",
+						"     disjoint: false) ~> split1@(ValidTRADING, InvalidTRADING)",
+						"joinDU split(!hasError() && isNull(DUID_COUNT),",
+						"     disjoint: false) ~> splitDU@(ValidDU, InvalidDU)",
+						"assertDU aggregate(groupBy(DUID),",
+						"     DUID_COUNT = count()) ~> aggregateDU",
+						"assertDU, filterDuplicateDU join(selectDU@DUID == aggregateDU@DUID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDU",
+						"split1@InvalidTRADING derive(FAULT_SOURCE = 'TRADING_PRICE',",
+						"          FAULT_REASON = 'TRADING_VALIDATION_FAILED',",
+						"          GOVERNANCE_STATUS = 'REJECTED',",
+						"          SCENARIO_ID = $ScenarioID,",
+						"          REPETITION = $Repetition) ~> derivedFaultTRADING",
+						"splitDU@InvalidDU derive(FAULT_SOURCE = 'DU_DETAIL_SUMMARY',",
+						"          FAULT_REASON = iif(!isNull(DUID_COUNT),\r",
+						"'DUPLICATE_DUID',         \r",
+						"'DU_VALIDATION_FAILED'),",
+						"          GOVERNANCE_STATUS = 'REJECTED',",
+						"          SCENARIO_ID = $ScenarioID,",
+						"          REPETITION = $Repetition) ~> derivedFaultDU",
+						"aggregateDU filter(DUID_COUNT > 1) ~> filterDuplicateDU",
+						"derivedSCADA sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkSCADA",
+						"derivedTRADING sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkTRADING",
+						"derivedREGION sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkREGION",
+						"derivedDU sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkDU",
+						"derivedFaultSCADA sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkFaultSCADA",
+						"derivedFaultRegion sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkFaultREGION",
+						"derivedFaultTRADING sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkFaultTRADING",
+						"derivedFaultDU sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkFaultDU"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_raw_region')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_trading')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_du')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_scada')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_scada')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_trading')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_region')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_du')]",
+				"[concat(variables('factoryId'), '/datasets/ds_faulty_scada')]",
+				"[concat(variables('factoryId'), '/datasets/ds_faulty_region')]",
+				"[concat(variables('factoryId'), '/datasets/ds_faulty_trading')]",
+				"[concat(variables('factoryId'), '/datasets/ds_faulty_du')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_ungoverned')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -1197,31 +2118,106 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "ds_raw",
+								"referenceName": "ds_raw_region",
 								"type": "DatasetReference"
 							},
-							"name": "source1"
+							"name": "sourceREGION"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_trading",
+								"type": "DatasetReference"
+							},
+							"name": "sourceTRADING"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_du",
+								"type": "DatasetReference"
+							},
+							"name": "sourceDU"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_scada",
+								"type": "DatasetReference"
+							},
+							"name": "sourceSCADA"
 						}
 					],
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ds_processed_parquet",
+								"referenceName": "ds_processed_scada",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "sinkSCADA"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_trading",
+								"type": "DatasetReference"
+							},
+							"name": "sinkTRADING"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_region",
+								"type": "DatasetReference"
+							},
+							"name": "sinkREGION"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_processed_du",
+								"type": "DatasetReference"
+							},
+							"name": "sinkDU"
 						}
 					],
 					"transformations": [
 						{
-							"name": "select1"
+							"name": "selectREGION"
+						},
+						{
+							"name": "selectTrading"
+						},
+						{
+							"name": "selectDU"
+						},
+						{
+							"name": "castTrading"
+						},
+						{
+							"name": "derivedTrading"
+						},
+						{
+							"name": "selectSCADA"
+						},
+						{
+							"name": "castSCADA"
+						},
+						{
+							"name": "derivedSCADA"
+						},
+						{
+							"name": "castREGION"
+						},
+						{
+							"name": "derivedREGION"
+						},
+						{
+							"name": "castDU"
+						},
+						{
+							"name": "derivedDU"
 						}
 					],
 					"scriptLines": [
 						"parameters{",
-						"     GovernanceTier as string,",
+						"     GovernanceMode as string,",
 						"     ScenarioID as string,",
-						"     TableName as string",
+						"     Repetition as string",
 						"}",
 						"source(output(",
 						"          SETTLEMENTDATE as string,",
@@ -1354,27 +2350,247 @@
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> source1",
-						"source1 select(mapColumn(",
-						"          each(match(/* All input columns */true()),",
-						"               /* Input name */$$ = $$)",
+						"     ignoreNoFilesFound: false) ~> sourceREGION",
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          RUNNO as string,",
+						"          REGIONID as string,",
+						"          PERIODID as string,",
+						"          RRP as string,",
+						"          EEP as string,",
+						"          INVALIDFLAG as string,",
+						"          LASTCHANGED as string,",
+						"          ROP as string,",
+						"          RAISE6SECRRP as string,",
+						"          RAISE6SECROP as string,",
+						"          RAISE60SECRRP as string,",
+						"          RAISE60SECROP as string,",
+						"          RAISE5MINRRP as string,",
+						"          RAISE5MINROP as string,",
+						"          RAISEREGRRP as string,",
+						"          RAISEREGROP as string,",
+						"          LOWER6SECRRP as string,",
+						"          LOWER6SECROP as string,",
+						"          LOWER60SECRRP as string,",
+						"          LOWER60SECROP as string,",
+						"          LOWER5MINRRP as string,",
+						"          LOWER5MINROP as string,",
+						"          LOWERREGRRP as string,",
+						"          LOWERREGROP as string,",
+						"          PRICE_STATUS as string,",
+						"          RAISE1SECRRP as string,",
+						"          RAISE1SECROP as string,",
+						"          LOWER1SECRRP as string,",
+						"          LOWER1SECROP as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceTRADING",
+						"source(output(",
+						"          DUID as string,",
+						"          START_DATE as string,",
+						"          END_DATE as string,",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as string,",
+						"          TRANSMISSIONLOSSFACTOR as string,",
+						"          STARTTYPE as string,",
+						"          DISTRIBUTIONLOSSFACTOR as string,",
+						"          MINIMUM_ENERGY_PRICE as string,",
+						"          MAXIMUM_ENERGY_PRICE as string,",
+						"          SCHEDULE_TYPE as string,",
+						"          MIN_RAMP_RATE_UP as string,",
+						"          MIN_RAMP_RATE_DOWN as string,",
+						"          MAX_RAMP_RATE_UP as string,",
+						"          MAX_RAMP_RATE_DOWN as string,",
+						"          IS_AGGREGATED as string,",
+						"          DISPATCHSUBTYPE as string,",
+						"          ADG_ID as string,",
+						"          LOAD_MINIMUM_ENERGY_PRICE as string,",
+						"          LOAD_MAXIMUM_ENERGY_PRICE as string,",
+						"          LOAD_MIN_RAMP_RATE_UP as string,",
+						"          LOAD_MIN_RAMP_RATE_DOWN as string,",
+						"          LOAD_MAX_RAMP_RATE_UP as string,",
+						"          LOAD_MAX_RAMP_RATE_DOWN as string,",
+						"          SECONDARY_TLF as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceDU",
+						"source(output(",
+						"          SETTLEMENTDATE as string,",
+						"          DUID as string,",
+						"          SCADAVALUE as string,",
+						"          LASTCHANGED as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceSCADA",
+						"sourceREGION select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          RUNNO,",
+						"          REGIONID,",
+						"          DISPATCHINTERVAL,",
+						"          TOTALDEMAND,",
+						"          AVAILABLEGENERATION,",
+						"          AVAILABLELOAD,",
+						"          DEMANDFORECAST,",
+						"          DISPATCHABLEGENERATION,",
+						"          DISPATCHABLELOAD,",
+						"          NETINTERCHANGE,",
+						"          LASTCHANGED",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectREGION",
+						"sourceTRADING select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          RUNNO,",
+						"          REGIONID,",
+						"          PERIODID,",
+						"          RRP,",
+						"          EEP,",
+						"          INVALIDFLAG,",
+						"          LASTCHANGED,",
+						"          ROP,",
+						"          PRICE_STATUS",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectTrading",
+						"sourceDU select(mapColumn(",
+						"          DUID,",
+						"          START_DATE,",
+						"          END_DATE,",
+						"          DISPATCHTYPE,",
+						"          CONNECTIONPOINTID,",
+						"          REGIONID,",
+						"          STATIONID,",
+						"          PARTICIPANTID,",
+						"          LASTCHANGED,",
+						"          TRANSMISSIONLOSSFACTOR,",
+						"          DISTRIBUTIONLOSSFACTOR,",
+						"          MINIMUM_ENERGY_PRICE,",
+						"          MAXIMUM_ENERGY_PRICE,",
+						"          SCHEDULE_TYPE,",
+						"          DISPATCHSUBTYPE",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectDU",
+						"selectTrading cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          PERIODID as integer,",
+						"          RRP as double,",
+						"          EEP as double,",
+						"          INVALIDFLAG as integer,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          ROP as double,",
+						"          PRICE_STATUS as string",
+						"     ),",
+						"     errors: false) ~> castTrading",
+						"castTrading derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          PRICE_SPREAD = RRP - ROP) ~> derivedTrading",
+						"sourceSCADA select(mapColumn(",
+						"          SETTLEMENTDATE,",
+						"          DUID,",
+						"          SCADAVALUE,",
+						"          LASTCHANGED",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectSCADA",
+						"selectSCADA cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          DUID as string,",
+						"          SCADAVALUE as double,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss'",
+						"     ),",
+						"     errors: false) ~> castSCADA",
+						"castSCADA derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          INTERVAL_MWH = SCADAVALUE * (5.0 / 60.0)) ~> derivedSCADA",
+						"selectREGION cast(output(",
+						"          SETTLEMENTDATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          RUNNO as integer,",
+						"          REGIONID as string,",
+						"          DISPATCHINTERVAL as integer,",
+						"          TOTALDEMAND as double,",
+						"          AVAILABLEGENERATION as double,",
+						"          AVAILABLELOAD as double,",
+						"          DEMANDFORECAST as double,",
+						"          DISPATCHABLEGENERATION as double,",
+						"          DISPATCHABLELOAD as double,",
+						"          NETINTERCHANGE as double,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss'",
+						"     ),",
+						"     errors: false) ~> castREGION",
+						"castREGION derive(TRADE_DATE = toDate(SETTLEMENTDATE),",
+						"          NET_DEMAND = TOTALDEMAND - NETINTERCHANGE,",
+						"          GENERATION_MARGIN = AVAILABLEGENERATION - TOTALDEMAND) ~> derivedREGION",
+						"selectDU cast(output(",
+						"          DUID as string,",
+						"          START_DATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          END_DATE as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          DISPATCHTYPE as string,",
+						"          CONNECTIONPOINTID as string,",
+						"          REGIONID as string,",
+						"          STATIONID as string,",
+						"          PARTICIPANTID as string,",
+						"          LASTCHANGED as timestamp 'yyyy/MM/dd HH:mm:ss',",
+						"          TRANSMISSIONLOSSFACTOR as double,",
+						"          DISTRIBUTIONLOSSFACTOR as double,",
+						"          MINIMUM_ENERGY_PRICE as double,",
+						"          MAXIMUM_ENERGY_PRICE as double,",
+						"          SCHEDULE_TYPE as string,",
+						"          DISPATCHSUBTYPE as string",
+						"     ),",
+						"     errors: false) ~> castDU",
+						"castDU derive(PRICE_RANGE = MAXIMUM_ENERGY_PRICE - MINIMUM_ENERGY_PRICE) ~> derivedDU",
+						"derivedSCADA sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sink1"
+						"     skipDuplicateMapOutputs: true) ~> sinkSCADA",
+						"derivedTrading sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkTRADING",
+						"derivedREGION sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkREGION",
+						"derivedDU sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkDU"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_raw')]",
-				"[concat(variables('factoryId'), '/datasets/ds_processed_parquet')]"
+				"[concat(variables('factoryId'), '/datasets/ds_raw_region')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_trading')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_du')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_scada')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_scada')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_trading')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_region')]",
+				"[concat(variables('factoryId'), '/datasets/ds_processed_du')]"
 			]
 		}
 	]
