@@ -550,7 +550,7 @@
 				"     disjoint: false) ~> splitDU@(ValidDU, InvalidDU)",
 				"assertDU aggregate(groupBy(DUID),",
 				"     DUID_COUNT = count()) ~> aggregateDU",
-				"assertDU, SelectDuplicateDU join(selectDU@DUID == DUPLICATE_DUID,",
+				"assertDU, castDuplicateDU join(DUID == DUPLICATE_DUID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
