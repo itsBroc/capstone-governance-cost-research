@@ -21,11 +21,75 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_REGION_SUM",
+				"folderPath": {
+					"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_REGION_SUM",
+					"type": "Expression"
+				},
 				"fileSystem": "capstone"
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "RUNNO",
+				"type": "INT32"
+			},
+			{
+				"name": "REGIONID",
+				"type": "UTF8"
+			},
+			{
+				"name": "DISPATCHINTERVAL",
+				"type": "INT32"
+			},
+			{
+				"name": "TOTALDEMAND",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "AVAILABLEGENERATION",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "AVAILABLELOAD",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "DEMANDFORECAST",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "DISPATCHABLEGENERATION",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "DISPATCHABLELOAD",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "NETINTERCHANGE",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "INT96"
+			},
+			{
+				"name": "TRADE_DATE",
+				"type": "DATE"
+			},
+			{
+				"name": "NET_DEMAND",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "GENERATION_MARGIN",
+				"type": "DOUBLE"
+			}
+		]
 	}
 }

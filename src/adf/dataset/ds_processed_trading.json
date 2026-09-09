@@ -21,11 +21,63 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/TRADING_PRICE",
+				"folderPath": {
+					"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/TRADING_PRICE",
+					"type": "Expression"
+				},
 				"fileSystem": "capstone"
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "RUNNO",
+				"type": "INT32"
+			},
+			{
+				"name": "REGIONID",
+				"type": "UTF8"
+			},
+			{
+				"name": "PERIODID",
+				"type": "INT32"
+			},
+			{
+				"name": "RRP",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "EEP",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "INVALIDFLAG",
+				"type": "INT32"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "INT96"
+			},
+			{
+				"name": "ROP",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "PRICE_STATUS",
+				"type": "UTF8"
+			},
+			{
+				"name": "TRADE_DATE",
+				"type": "DATE"
+			},
+			{
+				"name": "PRICE_SPREAD",
+				"type": "DOUBLE"
+			}
+		]
 	}
 }

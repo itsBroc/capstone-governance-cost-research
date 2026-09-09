@@ -21,11 +21,79 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DU_DETAIL_SUMMARY",
+				"folderPath": {
+					"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DU_DETAIL_SUMMARY",
+					"type": "Expression"
+				},
 				"fileSystem": "capstone"
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "DUID",
+				"type": "UTF8"
+			},
+			{
+				"name": "START_DATE",
+				"type": "INT96"
+			},
+			{
+				"name": "END_DATE",
+				"type": "INT96"
+			},
+			{
+				"name": "DISPATCHTYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "CONNECTIONPOINTID",
+				"type": "UTF8"
+			},
+			{
+				"name": "REGIONID",
+				"type": "UTF8"
+			},
+			{
+				"name": "STATIONID",
+				"type": "UTF8"
+			},
+			{
+				"name": "PARTICIPANTID",
+				"type": "UTF8"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "INT96"
+			},
+			{
+				"name": "TRANSMISSIONLOSSFACTOR",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "DISTRIBUTIONLOSSFACTOR",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "MINIMUM_ENERGY_PRICE",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "MAXIMUM_ENERGY_PRICE",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "SCHEDULE_TYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "DISPATCHSUBTYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "PRICE_RANGE",
+				"type": "DOUBLE"
+			}
+		]
 	}
 }

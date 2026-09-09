@@ -21,11 +21,39 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA",
+				"folderPath": {
+					"value": "data-processed/@{dataset().GovernanceMode}/@{dataset().ScenarioID}/@{dataset().Repetition}/DISPATCH_UNIT_SCADA",
+					"type": "Expression"
+				},
 				"fileSystem": "capstone"
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SETTLEMENTDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "DUID",
+				"type": "UTF8"
+			},
+			{
+				"name": "SCADAVALUE",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "LASTCHANGED",
+				"type": "INT96"
+			},
+			{
+				"name": "TRADE_DATE",
+				"type": "DATE"
+			},
+			{
+				"name": "INTERVAL_MWH",
+				"type": "DOUBLE"
+			}
+		]
 	}
 }
