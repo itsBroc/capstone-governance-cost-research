@@ -36,7 +36,20 @@
 											"secureOutput": false,
 											"secureInput": false
 										},
-										"userProperties": [],
+										"userProperties": [
+											{
+												"name": "Scenario",
+												"value": "@item().scenario"
+											},
+											{
+												"name": "GovernanceMode",
+												"value": "ungoverned"
+											},
+											{
+												"name": "Repetition",
+												"value": "@item().repetition"
+											}
+										],
 										"typeProperties": {
 											"dataflow": {
 												"referenceName": "df_ungoverned",
