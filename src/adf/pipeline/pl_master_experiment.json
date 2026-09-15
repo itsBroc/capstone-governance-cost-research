@@ -31,7 +31,7 @@
 									"value": "@item().scenario"
 								},
 								{
-									"name": "Mode",
+									"name": "GovernanceMode",
 									"value": "governed"
 								},
 								{
