@@ -18,7 +18,20 @@
 							"name": "If_Governed",
 							"type": "IfCondition",
 							"dependsOn": [],
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "Scenario",
+									"value": "@item().scenario"
+								},
+								{
+									"name": "Mode",
+									"value": "governed"
+								},
+								{
+									"name": "Repetition",
+									"value": "@item().repetition"
+								}
+							],
 							"typeProperties": {
 								"expression": {
 									"value": "@equals(item().mode, 'governed')",
