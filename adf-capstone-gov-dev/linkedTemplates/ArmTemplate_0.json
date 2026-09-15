@@ -38,6 +38,27 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ir-capstone')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "Australia East",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 16,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_faulty_du')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1446,6 +1467,72 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_warmup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "RandomNums.csv",
+						"folderPath": "warmup",
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "RowID",
+						"type": "String"
+					},
+					{
+						"name": "Random Number",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_warmup_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "warmup",
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_goverened')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -2709,6 +2796,55 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/df_warmup')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_warmup",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_warmup_output",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          RowID as string,",
+						"          {Random Number} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_warmup')]",
+				"[concat(variables('factoryId'), '/datasets/ds_warmup_output')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_master_experiment')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2717,7 +2853,14 @@
 					{
 						"name": "ForEach_ExperimentRun",
 						"type": "ForEach",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Warmup_Dataflow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
@@ -2736,7 +2879,7 @@
 											"value": "@item().scenario"
 										},
 										{
-											"name": "Mode",
+											"name": "GovernanceMode",
 											"value": "governed"
 										},
 										{
@@ -2829,9 +2972,9 @@
 														}
 													},
 													"staging": {},
-													"compute": {
-														"coreCount": 16,
-														"computeType": "General"
+													"integrationRuntime": {
+														"referenceName": "ir-capstone",
+														"type": "IntegrationRuntimeReference"
 													},
 													"traceLevel": "Fine"
 												}
@@ -2933,9 +3076,9 @@
 														}
 													},
 													"staging": {},
-													"compute": {
-														"coreCount": 16,
-														"computeType": "General"
+													"integrationRuntime": {
+														"referenceName": "ir-capstone",
+														"type": "IntegrationRuntimeReference"
 													},
 													"traceLevel": "Fine"
 												}
@@ -2944,6 +3087,36 @@
 									}
 								}
 							]
+						}
+					},
+					{
+						"name": "Warmup_Dataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_warmup",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "ir-capstone",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -2958,6 +3131,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_warmup')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/ir-capstone')]",
 				"[concat(variables('factoryId'), '/dataflows/df_ungoverned')]",
 				"[concat(variables('factoryId'), '/dataflows/df_goverened')]"
 			]
