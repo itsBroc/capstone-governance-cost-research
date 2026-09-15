@@ -1,0 +1,18 @@
+{
+	"name": "ir-capstone",
+	"properties": {
+		"type": "Managed",
+		"typeProperties": {
+			"computeProperties": {
+				"location": "Australia East",
+				"dataFlowProperties": {
+					"computeType": "General",
+					"coreCount": 16,
+					"timeToLive": 10,
+					"cleanup": false,
+					"customProperties": []
+				}
+			}
+		}
+	}
+}
