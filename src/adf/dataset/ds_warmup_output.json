@@ -1,0 +1,23 @@
+{
+	"name": "ds_warmup_output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_capstone",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "warmup",
+				"fileSystem": "capstone"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
