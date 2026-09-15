@@ -123,9 +123,9 @@
 													}
 												}
 											},
-											"compute": {
-												"coreCount": 16,
-												"computeType": "General"
+											"integrationRuntime": {
+												"referenceName": "ir-capstone",
+												"type": "IntegrationRuntimeReference"
 											},
 											"traceLevel": "Fine"
 										}
@@ -226,9 +226,9 @@
 													}
 												}
 											},
-											"compute": {
-												"coreCount": 16,
-												"computeType": "General"
+											"integrationRuntime": {
+												"referenceName": "ir-capstone",
+												"type": "IntegrationRuntimeReference"
 											},
 											"traceLevel": "Fine"
 										}
@@ -280,9 +280,9 @@
 						"referenceName": "df_warmup",
 						"type": "DataFlowReference"
 					},
-					"compute": {
-						"coreCount": 16,
-						"computeType": "General"
+					"integrationRuntime": {
+						"referenceName": "ir-capstone",
+						"type": "IntegrationRuntimeReference"
 					},
 					"traceLevel": "Fine"
 				}
