@@ -42,7 +42,20 @@
 									"name": "If_Governed",
 									"type": "IfCondition",
 									"dependsOn": [],
-									"userProperties": [],
+									"userProperties": [
+										{
+											"name": "Scenario",
+											"value": "@item().scenario"
+										},
+										{
+											"name": "Mode",
+											"value": "governed"
+										},
+										{
+											"name": "Repetition",
+											"value": "@item().repetition"
+										}
+									],
 									"typeProperties": {
 										"expression": {
 											"value": "@equals(item().mode, 'governed')",
@@ -60,7 +73,20 @@
 													"secureOutput": false,
 													"secureInput": false
 												},
-												"userProperties": [],
+												"userProperties": [
+													{
+														"name": "Scenario",
+														"value": "@item().scenario"
+													},
+													{
+														"name": "GovernanceMode",
+														"value": "ungoverned"
+													},
+													{
+														"name": "Repetition",
+														"value": "@item().repetition"
+													}
+												],
 												"typeProperties": {
 													"dataflow": {
 														"referenceName": "df_ungoverned",
@@ -135,7 +161,20 @@
 													"secureOutput": false,
 													"secureInput": false
 												},
-												"userProperties": [],
+												"userProperties": [
+													{
+														"name": "Scenario",
+														"value": "@item().scenario"
+													},
+													{
+														"name": "GovernanceMode",
+														"value": "governed"
+													},
+													{
+														"name": "Repetition",
+														"value": "@item().repetition"
+													}
+												],
 												"typeProperties": {
 													"dataflow": {
 														"referenceName": "df_goverened",
