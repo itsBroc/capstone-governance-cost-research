@@ -1,0 +1,17 @@
+{
+	"name": "02_S1_Type_Corruption",
+	"properties": {
+		"content": {
+			"query": "-- Residual invalid/null values in processed output\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS InvalidSCADARows\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nWHERE SCADAVALUE IS NULL\n\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g\nWHERE SCADAVALUE IS NULL;\n\n\n-- Impact on derived field\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS NullIntervalMWh\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nWHERE INTERVAL_MWH IS NULL\n\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g\nWHERE INTERVAL_MWH IS NULL;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
