@@ -1,0 +1,340 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-capstone-gov-dev"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_master_experiment')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach_ExperimentRun",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Warmup_Dataflow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.RunMatrix",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "If_Governed",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [
+										{
+											"name": "Scenario",
+											"value": "@item().scenario"
+										},
+										{
+											"name": "GovernanceMode",
+											"value": "governed"
+										},
+										{
+											"name": "Repetition",
+											"value": "@item().repetition"
+										}
+									],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(item().mode, 'governed')",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "Run_Ungoverned",
+												"type": "ExecuteDataFlow",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [
+													{
+														"name": "Scenario",
+														"value": "@item().scenario"
+													},
+													{
+														"name": "GovernanceMode",
+														"value": "ungoverned"
+													},
+													{
+														"name": "Repetition",
+														"value": "@item().repetition"
+													}
+												],
+												"typeProperties": {
+													"dataflow": {
+														"referenceName": "df_ungoverned",
+														"type": "DataFlowReference",
+														"parameters": {
+															"GovernanceMode": {
+																"value": "'@{'ungoverned'}'",
+																"type": "Expression"
+															},
+															"ScenarioID": {
+																"value": "'@{item().scenario}'",
+																"type": "Expression"
+															},
+															"Repetition": {
+																"value": "'@{item().repetition}'",
+																"type": "Expression"
+															}
+														},
+														"datasetParameters": {
+															"sourceREGION": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceTRADING": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceDU": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceSCADA": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sinkSCADA": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkTRADING": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkREGION": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkDU": {
+																"GovernanceMode": "ungoverned",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															}
+														}
+													},
+													"staging": {},
+													"integrationRuntime": {
+														"referenceName": "ir-capstone",
+														"type": "IntegrationRuntimeReference"
+													},
+													"traceLevel": "Fine"
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "Run_Governed",
+												"type": "ExecuteDataFlow",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [
+													{
+														"name": "Scenario",
+														"value": "@item().scenario"
+													},
+													{
+														"name": "GovernanceMode",
+														"value": "governed"
+													},
+													{
+														"name": "Repetition",
+														"value": "@item().repetition"
+													}
+												],
+												"typeProperties": {
+													"dataflow": {
+														"referenceName": "df_goverened",
+														"type": "DataFlowReference",
+														"parameters": {
+															"GovernanceMode": {
+																"value": "'@{'governed'}'",
+																"type": "Expression"
+															},
+															"ScenarioID": {
+																"value": "'@{item().scenario}'",
+																"type": "Expression"
+															},
+															"Repetition": {
+																"value": "'@{item().repetition}'",
+																"type": "Expression"
+															}
+														},
+														"datasetParameters": {
+															"sourceREGION": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceTRADING": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceDU": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sourceSCADA": {
+																"ScenarioID": "@item().scenario"
+															},
+															"sinkSCADA": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkTRADING": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkREGION": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkDU": {
+																"GovernanceMode": "governed",
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultSCADA": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultREGION": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultTRADING": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															},
+															"sinkFaultDU": {
+																"ScenarioID": "@item().scenario",
+																"Repetition": "@item().repetition"
+															}
+														}
+													},
+													"staging": {},
+													"integrationRuntime": {
+														"referenceName": "ir-capstone",
+														"type": "IntegrationRuntimeReference"
+													},
+													"traceLevel": "Fine"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "Run_Propagation_Consumer",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "If_Governed",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "ls_synapse_capstone",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "WITH scada AS (\n    SELECT\n        SETTLEMENTDATE,\n        DUID,\n        SCADAVALUE,\n        INTERVAL_MWH\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DISPATCH_UNIT_SCADA/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS s\n),\n\ndu AS (\n    SELECT\n        DUID,\n        REGIONID\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DU_DETAIL_SUMMARY/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS d\n),\n\nregion_sum AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        TOTALDEMAND,\n        NET_DEMAND,\n        GENERATION_MARGIN\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DISPATCH_REGION_SUM/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS r\n),\n\ntrading_price AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        RRP\n        FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/TRADING_PRICE/*.parquet',\n            FORMAT = 'PARQUET'\n    ) AS t\n),\n\nconsumer AS (\n    SELECT\n        s.SETTLEMENTDATE,\n        s.DUID,\n        d.REGIONID,\n        s.SCADAVALUE,\n        s.INTERVAL_MWH,\n        r.TOTALDEMAND,\n        r.NET_DEMAND,\n        r.GENERATION_MARGIN,\n        t.RRP,\n        t.PRICE_STATUS\n    FROM scada AS s\n\n    LEFT JOIN du AS d\n        on s.DUID = d.DUID\n    \n    LEFT JOIN region_sum AS r\n        ON d.REGIONID = r.REGIONID\n        AND s.SETTLEMENTDATE = r.SETTLEMENTDATE\n\n    LEFT JOIN trading_price AS t\n        ON d.REGIONID = t.REGIONID\n        AND s.SETTLEMENTDATE = t.SETTLEMENTDATE\n)\n\nSELECT \n    SETTLEMENTDATE,\n    REGIONID,\n    COUNT(*) AS RECORD_COUNT,\n    COUNT(DISTINCT DUID) AS UNIT_COUNT,\n    SUM(INTERVAL_MWH) AS TOTAL_INTERVAL_MWH,\n    AVG(SCADAVALUE) AS AVG_SCADA_VALUE,\n    MAX(TOTALDEMAND) AS TOTALDEMAND,\n    MAX(NET_DEMAND) AS NET_DEMAND,\n    MAX(GENERATION_MARGIN) AS REGION_GENERATION_MARGIN,\n    MAX(RRP) AS RRP,\n    SUM(INTERVAL_MWH) * MAX(RRP) AS ESTIMATED_INTERVAL_VALUE\n\nFROM consumer\nGROUP BY\n    SETTLEMENTDATE,\n    REGIONID;",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Warmup_Dataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_warmup",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "ir-capstone",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"RunMatrix": {
+						"type": "array"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}

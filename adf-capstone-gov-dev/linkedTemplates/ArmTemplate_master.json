@@ -11,9 +11,25 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_adls_capstone'"
 		},
+		"ls_synapse_capstone_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_synapse_capstone'"
+		},
 		"ls_adls_capstone_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stcapstonegovdev01.dfs.core.windows.net/"
+		},
+		"ls_synapse_capstone_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "syn-capstone-gov-ondemand.sql.azuresynapse.net"
+		},
+		"ls_synapse_capstone_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "master"
+		},
+		"ls_synapse_capstone_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqladminuserv"
 		},
 		"containerUri": {
 			"type": "string",
@@ -45,12 +61,44 @@
 					"ls_adls_capstone_accountKey": {
 						"value": "[parameters('ls_adls_capstone_accountKey')]"
 					},
+					"ls_synapse_capstone_password": {
+						"value": "[parameters('ls_synapse_capstone_password')]"
+					},
 					"ls_adls_capstone_properties_typeProperties_url": {
 						"value": "[parameters('ls_adls_capstone_properties_typeProperties_url')]"
+					},
+					"ls_synapse_capstone_properties_typeProperties_server": {
+						"value": "[parameters('ls_synapse_capstone_properties_typeProperties_server')]"
+					},
+					"ls_synapse_capstone_properties_typeProperties_database": {
+						"value": "[parameters('ls_synapse_capstone_properties_typeProperties_database')]"
+					},
+					"ls_synapse_capstone_properties_typeProperties_userName": {
+						"value": "[parameters('ls_synapse_capstone_properties_typeProperties_userName')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "adf-capstone-gov-dev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-capstone-gov-dev_ArmTemplate_0')]"
+			]
 		}
 	]
 }

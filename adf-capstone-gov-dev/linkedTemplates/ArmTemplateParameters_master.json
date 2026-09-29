@@ -8,8 +8,20 @@
 		"ls_adls_capstone_accountKey": {
 			"value": ""
 		},
+		"ls_synapse_capstone_password": {
+			"value": ""
+		},
 		"ls_adls_capstone_properties_typeProperties_url": {
 			"value": "https://stcapstonegovdev01.dfs.core.windows.net/"
+		},
+		"ls_synapse_capstone_properties_typeProperties_server": {
+			"value": "syn-capstone-gov-ondemand.sql.azuresynapse.net"
+		},
+		"ls_synapse_capstone_properties_typeProperties_database": {
+			"value": "master"
+		},
+		"ls_synapse_capstone_properties_typeProperties_userName": {
+			"value": "sqladminuserv"
 		},
 		"containerUri": {
 			"value": ""

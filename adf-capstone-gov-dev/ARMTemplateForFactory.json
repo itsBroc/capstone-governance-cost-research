@@ -11,9 +11,25 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_adls_capstone'"
 		},
+		"ls_synapse_capstone_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_synapse_capstone'"
+		},
 		"ls_adls_capstone_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stcapstonegovdev01.dfs.core.windows.net/"
+		},
+		"ls_synapse_capstone_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "syn-capstone-gov-ondemand.sql.azuresynapse.net"
+		},
+		"ls_synapse_capstone_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "master"
+		},
+		"ls_synapse_capstone_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqladminuserv"
 		}
 	},
 	"variables": {
@@ -261,6 +277,42 @@
 											}
 										]
 									}
+								},
+								{
+									"name": "Run_Propagation_Consumer",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "If_Governed",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "ls_synapse_capstone",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "WITH scada AS (\n    SELECT\n        SETTLEMENTDATE,\n        DUID,\n        SCADAVALUE,\n        INTERVAL_MWH\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DISPATCH_UNIT_SCADA/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS s\n),\n\ndu AS (\n    SELECT\n        DUID,\n        REGIONID\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DU_DETAIL_SUMMARY/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS d\n),\n\nregion_sum AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        TOTALDEMAND,\n        NET_DEMAND,\n        GENERATION_MARGIN\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/DISPATCH_REGION_SUM/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS r\n),\n\ntrading_price AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        RRP\n        FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/@{item().GovernanceMode}/@{item().ScenarioID}/@{item().Repetition}/TRADING_PRICE/*.parquet',\n            FORMAT = 'PARQUET'\n    ) AS t\n),\n\nconsumer AS (\n    SELECT\n        s.SETTLEMENTDATE,\n        s.DUID,\n        d.REGIONID,\n        s.SCADAVALUE,\n        s.INTERVAL_MWH,\n        r.TOTALDEMAND,\n        r.NET_DEMAND,\n        r.GENERATION_MARGIN,\n        t.RRP,\n        t.PRICE_STATUS\n    FROM scada AS s\n\n    LEFT JOIN du AS d\n        on s.DUID = d.DUID\n    \n    LEFT JOIN region_sum AS r\n        ON d.REGIONID = r.REGIONID\n        AND s.SETTLEMENTDATE = r.SETTLEMENTDATE\n\n    LEFT JOIN trading_price AS t\n        ON d.REGIONID = t.REGIONID\n        AND s.SETTLEMENTDATE = t.SETTLEMENTDATE\n)\n\nSELECT \n    SETTLEMENTDATE,\n    REGIONID,\n    COUNT(*) AS RECORD_COUNT,\n    COUNT(DISTINCT DUID) AS UNIT_COUNT,\n    SUM(INTERVAL_MWH) AS TOTAL_INTERVAL_MWH,\n    AVG(SCADAVALUE) AS AVG_SCADA_VALUE,\n    MAX(TOTALDEMAND) AS TOTALDEMAND,\n    MAX(NET_DEMAND) AS NET_DEMAND,\n    MAX(GENERATION_MARGIN) AS REGION_GENERATION_MARGIN,\n    MAX(RRP) AS RRP,\n    SUM(INTERVAL_MWH) * MAX(RRP) AS ESTIMATED_INTERVAL_VALUE\n\nFROM consumer\nGROUP BY\n    SETTLEMENTDATE,\n    REGIONID;",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
 								}
 							]
 						}
@@ -309,6 +361,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_warmup')]",
 				"[concat(variables('factoryId'), '/integrationRuntimes/ir-capstone')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_synapse_capstone')]",
 				"[concat(variables('factoryId'), '/dataflows/df_ungoverned')]",
 				"[concat(variables('factoryId'), '/dataflows/df_goverened')]"
 			]
@@ -1722,6 +1775,72 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_warmup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "RandomNums.csv",
+						"folderPath": "warmup",
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "RowID",
+						"type": "String"
+					},
+					{
+						"name": "Random Number",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_warmup_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_capstone",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "warmup",
+						"fileSystem": "capstone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ls_adls_capstone')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1733,6 +1852,49 @@
 					"accountKey": {
 						"type": "SecureString",
 						"value": "[parameters('ls_adls_capstone_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_synapse_capstone')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"server": "[parameters('ls_synapse_capstone_properties_typeProperties_server')]",
+					"database": "[parameters('ls_synapse_capstone_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_synapse_capstone_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_synapse_capstone_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ir-capstone')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "Australia East",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 16,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
 					}
 				}
 			},
@@ -3002,27 +3164,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ir-capstone')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "Australia East",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 16,
-							"timeToLive": 10,
-							"cleanup": false,
-							"customProperties": []
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/df_warmup')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -3069,72 +3210,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_warmup')]",
 				"[concat(variables('factoryId'), '/datasets/ds_warmup_output')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_warmup')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_adls_capstone",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "RandomNums.csv",
-						"folderPath": "warmup",
-						"fileSystem": "capstone"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "RowID",
-						"type": "String"
-					},
-					{
-						"name": "Random Number",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_warmup_output')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_adls_capstone",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "warmup",
-						"fileSystem": "capstone"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_adls_capstone')]"
 			]
 		}
 	]
