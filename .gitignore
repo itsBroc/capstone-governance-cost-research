@@ -4,3 +4,5 @@ data-faults/
 Meeting Minutes/
 __pycache__/
 *.py[cod]
+.env
+.venv/
