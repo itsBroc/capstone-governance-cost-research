@@ -1,0 +1,237 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "syn-capstone-gov"
+		},
+		"syn-capstone-gov-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'syn-capstone-gov-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:syn-capstone-gov.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"syn-capstone-gov-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stcapstonegovdev01.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/syn-capstone-gov-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('syn-capstone-gov-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/syn-capstone-gov-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('syn-capstone-gov-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/01_s0_Baseline')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- 1. Compare processed row counts\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS ProcessedRows\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g;\n\n-- 2. Check for unexpected nulls in key SCADA fields\nSELECT\n    'Ungoverned' AS Mode,\n    SUM(CASE WHEN DUID IS NULL THEN 1 ELSE 0 END) AS NullDUID,\n    SUM(CASE WHEN SCADAVALUE IS NULL THEN 1 ELSE 0 END) AS NullSCADAVALUE,\n    SUM(CASE WHEN SETTLEMENTDATE IS NULL THEN 1 ELSE 0 END) AS NullSETTLEMENTDATE,\n    SUM(CASE WHEN INTERVAL_MWH IS NULL THEN 1 ELSE 0 END) AS NullINTERVAL_MWH\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nUNION ALL\n\nSELECT\n    'Governed',\n    SUM(CASE WHEN DUID IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN SCADAVALUE IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN SETTLEMENTDATE IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN INTERVAL_MWH IS NULL THEN 1 ELSE 0 END)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/02_S1_Type_Corruption')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- Residual invalid/null values in processed output\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS InvalidSCADARows\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nWHERE SCADAVALUE IS NULL\n\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g\nWHERE SCADAVALUE IS NULL;\n\n\n-- Impact on derived field\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS NullIntervalMWh\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nWHERE INTERVAL_MWH IS NULL\n\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s1/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g\nWHERE INTERVAL_MWH IS NULL;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/03_S2_Missing_Values')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/04_S3_Schema_Drift')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/05_S4_Duplicate_Records')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/06_S5_Null_Propogation')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Propogation_Consumer_Script')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "WITH scada AS (\n    SELECT\n        SETTLEMENTDATE,\n        DUID,\n        SCADAVALUE,\n        INTERVAL_MWH\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_UNIT_SCADA/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS s\n),\n\ndu AS (\n    SELECT\n        DUID,\n        REGIONID\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DU_DETAIL_SUMMARY/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS d\n),\n\nregion_sum AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        TOTALDEMAND,\n        NET_DEMAND,\n        GENERATION_MARGIN\n    FROM OPENROWSET(\n        BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_REGION_SUM/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS r\n),\n\ntrading_price AS (\n    SELECT\n        SETTLEMENTDATE,\n        REGIONID,\n        RRP,\n        PRICE_STATUS\n        FROM OPENROWSET(\n            BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/TRADING_PRICE/*.parquet',\n            FORMAT = 'PARQUET'\n    ) AS t\n),\n\nconsumer AS (\n    SELECT\n        s.SETTLEMENTDATE,\n        s.DUID,\n        d.REGIONID,\n        s.SCADAVALUE,\n        s.INTERVAL_MWH,\n        r.TOTALDEMAND,\n        r.NET_DEMAND,\n        r.GENERATION_MARGIN,\n        t.RRP,\n        t.PRICE_STATUS\n    FROM scada AS s\n\n    LEFT JOIN du AS d\n        on s.DUID = d.DUID\n    \n    LEFT JOIN region_sum AS r\n        ON d.REGIONID = r.REGIONID\n        AND s.SETTLEMENTDATE = r.SETTLEMENTDATE\n\n    LEFT JOIN trading_price AS t\n        ON d.REGIONID = t.REGIONID\n        AND s.SETTLEMENTDATE = t.SETTLEMENTDATE\n),\n\nconsumer_report AS (\n    SELECT \n        SETTLEMENTDATE,\n        REGIONID,\n        COUNT(*) AS RECORD_COUNT,\n        COUNT(DISTINCT DUID) AS UNIT_COUNT,\n        SUM(INTERVAL_MWH) AS TOTAL_INTERVAL_MWH,\n        AVG(SCADAVALUE) AS AVG_SCADA_VALUE,\n        MAX(TOTALDEMAND) AS TOTALDEMAND,\n        MAX(NET_DEMAND) AS NET_DEMAND,\n        MAX(GENERATION_MARGIN) AS REGION_GENERATION_MARGIN,\n        MAX(RRP) AS RRP,\n        SUM(INTERVAL_MWH) * MAX(RRP) AS ESTIMATED_INTERVAL_VALUE,\n        SUM(CASE WHEN REGIONID IS NULL THEN 1 ELSE 0 END) AS NULL_REGION_ROWS,\n        SUM(CASE WHEN TOTALDEMAND IS NULL THEN 1 ELSE 0 END) AS NULL_DEMAND_ROWS,\n        SUM(CASE WHEN RRP IS NULL THEN 1 ELSE 0 END) AS NULL_PRICE_ROWS\n\n    FROM consumer\n    GROUP BY\n        SETTLEMENTDATE,\n        REGIONID\n)\n\nSELECT\n    COUNT(*) AS REPORT_ROWS,\n    SUM(RECORD_COUNT) AS CONSUMER_ROWS,\n    SUM(UNIT_COUNT) AS UNIT_COUNT_SUM,\n    SUM(TOTAL_INTERVAL_MWH) AS TOTAL_MWH,\n    SUM(ESTIMATED_INTERVAL_VALUE) AS TOTAL_VALUE,\n    SUM(NULL_REGION_ROWS) AS NULL_REGION_ROWS,\n    SUM(NULL_DEMAND_ROWS) AS NULL_DEMAND_ROWS,\n    SUM(NULL_PRICE_ROWS) AS NULL_PRICE_ROWS\nFROM consumer_report;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		}
+	]
+}
