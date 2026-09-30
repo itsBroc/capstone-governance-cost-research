@@ -1,0 +1,17 @@
+{
+	"name": "06_S5_Null_Propogation",
+	"properties": {
+		"content": {
+			"query": "",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

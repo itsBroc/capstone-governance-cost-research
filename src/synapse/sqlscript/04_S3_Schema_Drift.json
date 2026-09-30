@@ -1,0 +1,17 @@
+{
+	"name": "04_S3_Schema_Drift",
+	"properties": {
+		"content": {
+			"query": "",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "01_s0_Baseline",
+	"properties": {
+		"content": {
+			"query": "-- 1. Compare processed row counts\nSELECT\n    'Ungoverned' AS Mode,\n    COUNT(*) AS ProcessedRows\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nUNION ALL\n\nSELECT\n    'Governed',\n    COUNT(*)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g;\n\n-- 2. Check for unexpected nulls in key SCADA fields\nSELECT\n    'Ungoverned' AS Mode,\n    SUM(CASE WHEN DUID IS NULL THEN 1 ELSE 0 END) AS NullDUID,\n    SUM(CASE WHEN SCADAVALUE IS NULL THEN 1 ELSE 0 END) AS NullSCADAVALUE,\n    SUM(CASE WHEN SETTLEMENTDATE IS NULL THEN 1 ELSE 0 END) AS NullSETTLEMENTDATE,\n    SUM(CASE WHEN INTERVAL_MWH IS NULL THEN 1 ELSE 0 END) AS NullINTERVAL_MWH\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/ungoverned/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS u\nUNION ALL\n\nSELECT\n    'Governed',\n    SUM(CASE WHEN DUID IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN SCADAVALUE IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN SETTLEMENTDATE IS NULL THEN 1 ELSE 0 END),\n    SUM(CASE WHEN INTERVAL_MWH IS NULL THEN 1 ELSE 0 END)\nFROM OPENROWSET(\n    BULK 'https://stcapstonegovdev01.dfs.core.windows.net/capstone/data-processed/governed/s0/r1/DISPATCH_UNIT_SCADA/**',\n    FORMAT = 'PARQUET'\n) AS g;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
