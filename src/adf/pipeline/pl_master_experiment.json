@@ -254,7 +254,20 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "Scenario",
+									"value": "@{item().scenario}"
+								},
+								{
+									"name": "GovernanceMode",
+									"value": "@{item().mode}"
+								},
+								{
+									"name": "Repetition",
+									"value": "@{item().repetition}"
+								}
+							],
 							"linkedServiceName": {
 								"referenceName": "ls_synapse_capstone",
 								"type": "LinkedServiceReference"
