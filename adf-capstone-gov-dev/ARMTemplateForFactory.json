@@ -1875,9 +1875,15 @@
 						"type": "SecureString",
 						"value": "[parameters('ls_synapse_capstone_password')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "ir-capstone",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/ir-capstone')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ir-capstone')]",
