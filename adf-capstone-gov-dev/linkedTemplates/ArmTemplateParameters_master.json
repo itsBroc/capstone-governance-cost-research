@@ -21,7 +21,7 @@
 			"value": "master"
 		},
 		"ls_synapse_capstone_properties_typeProperties_userName": {
-			"value": "sqladminuserv"
+			"value": "sqladminuser"
 		},
 		"containerUri": {
 			"value": ""

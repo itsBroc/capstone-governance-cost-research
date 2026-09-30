@@ -29,7 +29,7 @@
 		},
 		"ls_synapse_capstone_properties_typeProperties_userName": {
 			"type": "string",
-			"defaultValue": "sqladminuserv"
+			"defaultValue": "sqladminuser"
 		}
 	},
 	"variables": {
