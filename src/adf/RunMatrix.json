@@ -30,6 +30,26 @@
     "repetition": "r3"
   },
   {
+    "scenario": "s0",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s0",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s0",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s0",
+    "mode": "governed",
+    "repetition": "r5"
+  },  
+  {
     "scenario": "s1",
     "mode": "ungoverned",
     "repetition": "r1"
@@ -58,6 +78,26 @@
     "scenario": "s1",
     "mode": "governed",
     "repetition": "r3"
+  },
+  {
+    "scenario": "s1",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s1",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s1",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s1",
+    "mode": "governed",
+    "repetition": "r5"
   },
   {
     "scenario": "s2",
@@ -90,6 +130,26 @@
     "repetition": "r3"
   },
   {
+    "scenario": "s2",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s2",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s2",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s2",
+    "mode": "governed",
+    "repetition": "r5"
+  },
+  {
     "scenario": "s3",
     "mode": "ungoverned",
     "repetition": "r1"
@@ -118,6 +178,26 @@
     "scenario": "s3",
     "mode": "governed",
     "repetition": "r3"
+  },
+  {
+    "scenario": "s3",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s3",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s3",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s3",
+    "mode": "governed",
+    "repetition": "r5"
   },
   {
     "scenario": "s4",
@@ -150,6 +230,26 @@
     "repetition": "r3"
   },
   {
+    "scenario": "s4",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s4",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s4",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s4",
+    "mode": "governed",
+    "repetition": "r5"
+  },
+  {
     "scenario": "s5",
     "mode": "ungoverned",
     "repetition": "r1"
@@ -178,5 +278,25 @@
     "scenario": "s5",
     "mode": "governed",
     "repetition": "r3"
+  },
+  {
+    "scenario": "s5",
+    "mode": "ungoverned",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s5",
+    "mode": "governed",
+    "repetition": "r4"
+  },
+  {
+    "scenario": "s5",
+    "mode": "ungoverned",
+    "repetition": "r5"
+  },
+  {
+    "scenario": "s5",
+    "mode": "governed",
+    "repetition": "r5"
   }
 ]

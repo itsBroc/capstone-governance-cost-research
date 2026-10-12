@@ -29,8 +29,8 @@ let LatestRunId =
 ADFActivityRun
 | where PipelineName == "{PIPELINE_NAME}"
 | where PipelineRunId == LatestRunId
-| where ActivityName in ("Run_Governed", "Run_Ungoverned")
-| where Status == "Succeeded"
+| where ActivityName in ("Run_Governed", "Run_Ungoverned")\
+| summarize arg_max(TimeGenerated, *) by ActivityRunId
 | extend Props = parse_json(UserProperties)
 | extend Out = parse_json(Output)
 | extend
@@ -103,7 +103,7 @@ ADFActivityRun
 | where PipelineName == "{PIPELINE_NAME}"
 | where PipelineRunId == LatestRunId
 | where ActivityName == "Run_Propagation_Consumer"
-
+| summarize arg_max(TimeGenerated, *) by ActivityRunId
 | extend Props = parse_json(UserProperties)
 | extend Out = parse_json(Output)
 
